@@ -1,5 +1,11 @@
 # Three-minute demo
 
+> Verified presentation baseline: `0ce9dad2a4a9dfd4815cad0a742fb46baa29bad5`.
+> Use [the captured presentation journey](PRESENTATION.md) and
+> [integrated results](evidence/integrated-main/README.md). The current verified
+> journey uses Source search; the first authorized live request failed because the
+> provider rejected the key. No successful live model response is established.
+
 ## Opening: the problem (20 seconds)
 
 “Leaving the hospital should be the start of recovery. Instead, patients have to turn a confusing set of instructions into appointments, reminders, and questions on their own. Homeward makes that next step clear and shows a care team what still needs attention.”

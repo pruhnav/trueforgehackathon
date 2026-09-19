@@ -1,0 +1,19 @@
+{
+  "commit": "0ce9dad2a4a9dfd4815cad0a742fb46baa29bad5",
+  "type": "baseline",
+  "completedAt": "2026-09-19T21:58:49.150609+00:00",
+  "commands": {
+    "npm run check": {
+      "exitCode": 0,
+      "nodeTests": 40,
+      "domTests": 2,
+      "build": "passed"
+    },
+    "npm run eval": {
+      "exitCode": 0,
+      "passed": 21,
+      "total": 21
+    }
+  },
+  "note": "Captured before evaluation changes. Local-server tests ran outside network sandbox."
+}

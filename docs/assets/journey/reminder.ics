@@ -1,0 +1,12 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Homeward//Discharge Reminder//EN
+BEGIN:VEVENT
+UID:63298a45-1791-47b9-9503-75ecea09727e@homeward.local
+DTSTAMP:20260919T223419Z
+DTSTART;VALUE=DATE:20260926
+DTEND;VALUE=DATE:20260927
+SUMMARY:Arrange your follow-up visit
+DESCRIPTION:Local Homeward reminder based on a fictional discharge plan. This is not a booked appointment.
+END:VEVENT
+END:VCALENDAR

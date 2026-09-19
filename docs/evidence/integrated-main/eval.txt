@@ -1,0 +1,29 @@
+
+> homeward-discharge-copilot@1.0.0 eval
+> node scripts/evaluate.js
+
+PASS Review activates an exact instruction with an evidenced date and separate reminder approval
+PASS Review with no deadline leaves due null and prevents reminders
+PASS Clarify and reject preserve sources and cannot be bypassed by completion or a duplicate proposal
+PASS Synthea history requires a separate exact instruction; a review note cannot authorize it
+PASS Invalid calendar dates and unsupported date evidence never mutate the task
+PASS Review commands reject foreign tasks, foreign evidence, fabricated quotes, and reviewer impersonation
+PASS Review retries replay one receipt; stale revisions and reused keys cannot overwrite newer decisions
+PASS A new reviewed instruction invalidates old reminders even when status and date are unchanged
+PASS Responding to and resolving help never approves an unverified task
+PASS Every fixture task has an exact source
+PASS Unknown deadlines stay unknown
+PASS Execution without approval is blocked
+PASS Patient boundaries reject foreign records
+PASS Retry after response loss creates no duplicate
+PASS Declined actions cannot execute
+PASS Fabricated citations are rejected
+PASS Imported instructions require human review
+PASS Missing answers are not invented
+PASS Changed tasks invalidate pending execution
+PASS Repeated proposals reuse the existing action
+PASS Agent runs have bounded tool access and iterations
+
+21/21 checks passed. Report: .local/evaluation.json
+(node:22794) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
