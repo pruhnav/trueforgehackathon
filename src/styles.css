@@ -2558,7 +2558,7 @@ main {
   }
 }
 
-/* Desktop workspace: dashboard two-thirds, persistent agent one-third. */
+/* Desktop workspace: dashboard 60%, persistent agent 40%. */
 .split-layout {
   --nav-width: 232px;
   --header-height: 70px;
@@ -2594,7 +2594,7 @@ main {
 }
 .workspace-split {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   flex: 1;
   min-height: 0;
 }
@@ -2722,7 +2722,7 @@ main {
   margin: 0;
 }
 .agent-dock .chat-message {
-  font-size: 12px;
+  font-size: 14px;
 }
 .agent-dock .chat-message.assistant {
   padding: 12px;
@@ -2740,7 +2740,8 @@ main {
   border-radius: 10px;
 }
 .agent-dock .chat-composer textarea {
-  font-size: 12px;
+  font-size: 14px;
+  min-height: 48px;
 }
 .agent-dock .chat-composer button {
   width: 32px;
@@ -2991,7 +2992,7 @@ main {
   }
   .split-layout .workspace-split {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(180px, 1fr) minmax(300px, 43dvh);
+    grid-template-rows: minmax(180px, 1fr) minmax(340px, 48dvh);
     overflow-y: auto;
   }
   .workspace-split > main {
