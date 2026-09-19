@@ -1,4 +1,6 @@
-# Homeward
+<p align="center">
+  <img src="docs/assets/homeward-banner.svg" alt="Homeward" width="100%">
+</p>
 
 **A clearer next step after discharge.**
 
