@@ -7,6 +7,8 @@ import { mountMcp } from './mcp.js';
 import { forgeStatus, runAgent, sourceSearch } from './trueforge.js';
 import { educationLinks, lookupEducation } from './education.js';
 import { DEMO_DATE } from './fixtures.js';
+import { isNextStepQuestion } from './guidance.js';
+import { agentTeam, routeAgent } from './agents.js';
 
 export function createApp(store) {
   const app = express();
@@ -37,10 +39,16 @@ export function createApp(store) {
     res.json({ ok: true, app: 'Homeward', syntheticOnly: true, demoDate: DEMO_DATE }),
   );
   app.get('/api/status', async (_req, res) => res.json(await forgeStatus()));
+  app.get('/api/agent-team', (_req, res) => res.json({
+    runtime: 'TrueForge',
+    routing: 'one_specialist_per_live_request',
+    roles: agentTeam.map(({ id, label, purpose, tools }) => ({ id, label, purpose, tools })),
+  }));
   app.get('/api/patients', (_req, res) =>
     res.json(store.all('patient').map((p) => ({ ...p, tasks: store.plan(p.id).tasks }))),
   );
   app.get('/api/patients/:id/plan', (req, res) => res.json(store.plan(req.params.id)));
+  app.get('/api/patients/:id/summary', (req, res) => res.json(store.dischargeSummary(req.params.id)));
   app.patch('/api/patients/:id/tasks/:taskId', (req, res) => {
     const { complete } = z.object({ complete: z.boolean() }).parse(req.body);
     res.json(store.completeTask(req.params.id, req.params.taskId, complete));
@@ -145,13 +153,16 @@ export function createApp(store) {
   const calls = [];
   app.post('/api/patients/:id/chat', async (req, res) => {
     store.patient(req.params.id);
-    const { message, mode } = z
+    const { message, mode, intent } = z
       .object({
         message: z.string().trim().min(2).max(2500),
         mode: z.enum(['live', 'source-search']),
+        intent: z.enum(['auto', 'summary', 'question', 'reminder', 'coordination']).default('auto'),
       })
       .parse(req.body);
-    if (mode === 'source-search') return res.json(sourceSearch(store, req.params.id, message));
+    const role = routeAgent(message, intent);
+    if (mode === 'source-search' || isNextStepQuestion(message))
+      return res.json(sourceSearch(store, req.params.id, message, role));
     while (calls[0] < Date.now() - 60000) calls.shift();
     if (active.has(req.params.id) || calls.length >= 8)
       throw new AppError(
@@ -161,7 +172,7 @@ export function createApp(store) {
     active.add(req.params.id);
     calls.push(Date.now());
     try {
-      res.json(await runAgent(store, req.params.id, message));
+      res.json(await runAgent(store, req.params.id, message, role));
     } finally {
       active.delete(req.params.id);
     }

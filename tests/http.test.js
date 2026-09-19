@@ -15,7 +15,7 @@ test('HTTP API and real MCP client exercise the approval boundary', async () => 
   try {
     await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
     const tools = await client.listTools();
-    assert.equal(tools.tools.length, 6);
+    assert.equal(tools.tools.length, 7);
     assert.ok(
       !tools.tools.some((t) => /approv/.test(t.name) && t.name !== 'execute_approved_reminder'),
     );

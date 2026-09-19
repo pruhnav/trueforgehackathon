@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { CareQueue, ReviewPanel, TaskHistory, DateEvidence } from './ReviewWorkspace.jsx';
+import PatientSummary, { AgentTeamOverview, roleLabels } from './PatientSummary.jsx';
 import {
   House,
   HeartPulse,
@@ -310,16 +311,20 @@ export default function App() {
   }
   function showSource(task) {
     const document = plan.documents.find((d) => d.id === task.source.documentId);
+    if (!document) {
+      setError('This source is no longer available in the selected plan. Refresh the plan.');
+      return;
+    }
     setSource({ document, sectionId: task.source.sectionId });
   }
   const done = plan?.tasks.filter((t) => t.status === 'completed').length || 0;
   const pendingApprovals =
     plan?.actions.filter((a) => a.status === 'proposed' && !a.stale).length || 0;
-  const nextTask = plan?.tasks
-    .filter((task) => task.status === 'pending' && task.due && !task.helpRequestedAt)
-    .sort((a, b) => a.due.localeCompare(b.due))[0];
+  const guidance = plan?.guidance;
+  const nextTask = guidance?.nextTask;
   const titles = {
     plan: 'My recovery',
+    summary: 'My discharge summary',
     team: 'Care team',
     sources: 'My documents',
     resources: 'Helpful resources',
@@ -355,6 +360,7 @@ export default function App() {
         <nav aria-label="Main navigation">
           {[
             ['plan', LayoutDashboard, 'My recovery'],
+            ['summary', BookOpen, 'My discharge summary'],
             ['team', Users, 'Care team'],
             ['sources', FileText, 'My documents'],
             ['resources', BookOpen, 'Resources'],
@@ -433,6 +439,9 @@ export default function App() {
             </div>
           </div>
           <div className="topbar-right">
+            <a className="button secondary emergency-call" href="tel:911" aria-label="Call 911 emergency services (US demo)">
+              Emergency · Call 911 (US)
+            </a>
             <span className="demo-tag">
               <span /> SYNTHETIC DEMO
             </span>
@@ -483,16 +492,14 @@ export default function App() {
                         <Plus size={17} /> Add discharge record
                       </button>
                     </div>
-                    <section className="recovery-hero">
+                    <section className="recovery-hero" aria-label="Next-step guidance">
                       <div className="hero-copy">
                         <div className="hero-pill">
-                          <span /> {nextTask ? 'NEXT ON YOUR PLAN' : 'YOUR RECOVERY CHECKLIST'}
+                          <span /> {nextTask ? 'NEXT DATED TASK' : 'YOUR RECOVERY CHECKLIST'}
                         </div>
-                        <h2>{nextTask ? nextTask.title : 'No dated tasks left to complete.'}</h2>
+                        <h2>{guidance?.heading || 'Review your recovery checklist.'}</h2>
                         <p>
-                          {nextTask
-                            ? 'One clear next step, backed by your discharge instructions.'
-                            : 'Review your checklist below for preparation and clarification items.'}
+                          {guidance?.summary || 'Review your checklist for preparation and clarification items.'}
                         </p>
                         <button
                           className="button hero-action"
@@ -510,7 +517,7 @@ export default function App() {
                           {nextTask ? prettyDate(nextTask.due) : `${done} / ${plan.tasks.length}`}
                         </strong>
                         <span>
-                          {nextTask ? 'From your discharge record' : 'Tasks reported complete'}
+                          {nextTask ? nextTask.dateLabel : 'Tasks reported complete'}
                         </span>
                         <div className="focus-summary-footer">
                           <Link2 size={13} /> Source-linked care plan
@@ -715,6 +722,15 @@ export default function App() {
                     </div>
                   </>
                 )}
+                {view === 'summary' && (
+                  <PatientSummary
+                    patientId={patientId}
+                    refreshKey={refreshKey}
+                    api={api}
+                    onSource={(reference) => showSource({ source: reference })}
+                    onAsk={focusAssistant}
+                  />
+                )}
                 {view === 'team' && (
                   <>
                     <PageTitle
@@ -899,9 +915,12 @@ export default function App() {
                   patientName={plan.patient.name.split(' ')[0]}
                   documents={plan.documents}
                   actions={plan.actions}
+                  guidance={plan.guidance}
+                  summaryVersion={plan.snapshotVersion}
                   status={status}
                   onImport={() => setImportOpen(true)}
                   onPlan={() => setView('plan')}
+                  onSummary={() => setView('summary')}
                   onReview={setAction}
                   onDocument={(document) => setSource({ document })}
                   onUpdate={refresh}
@@ -1321,9 +1340,12 @@ function Assistant({
   patientName,
   documents,
   actions,
+  guidance,
+  summaryVersion,
   status,
   onImport,
   onPlan,
+  onSummary,
   onReview,
   onDocument,
   onUpdate,
@@ -1380,14 +1402,14 @@ function Assistant({
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [messages, busy]);
-  async function send(value = input) {
+  async function send(value = input, intent = 'auto') {
     if (!value.trim() || busy) return;
     setInput('');
     setError('');
     setMessages((m) => [...m, { role: 'user', text: value }]);
     setBusy(true);
     try {
-      const result = await post(`/patients/${patientId}/chat`, { message: value, mode });
+      const result = await post(`/patients/${patientId}/chat`, { message: value, mode, intent });
       setMessages((m) => [...m, { role: 'assistant', text: result.answer, ...result }]);
       await onUpdate();
     } catch (e) {
@@ -1427,6 +1449,11 @@ function Assistant({
           View care plan <ArrowUpRight size={14} />
         </button>
       </div>
+      <div className="assistant-quick-actions" aria-label="Summary actions">
+        <button className="text-button" onClick={onSummary}>Open summary</button>
+        <button className="text-button" disabled={busy} onClick={() => send('Summarize my discharge instructions', 'summary')}>Ask discharge summarizer</button>
+      </div>
+      <AgentTeamOverview api={api} status={status} />
       <details className="assistant-settings">
         <summary>
           <span
@@ -1459,8 +1486,8 @@ function Assistant({
           {mode === 'live'
             ? status?.ready
               ? 'Live model · patient-scoped MCP tools · approval controls'
-              : 'Configure a model in TrueForge Settings → Models to enable live runs.'
-            : 'Exact document retrieval. No language model is used in this mode.'}
+              : 'Configure a model in TrueForge Settings → Models to enable live runs. Next-step guidance still works locally.'
+            : 'Current plan guidance and exact document retrieval. No language model is used in this mode.'}
         </div>
       </details>
       <div className="chat-messages">
@@ -1478,6 +1505,7 @@ function Assistant({
             </p>
             <div className="suggested-questions">
               {[
+                'What is my next step?',
                 'What follow-up do I need?',
                 'What paperwork should I bring?',
                 'What does the laboratory instruction say?',
@@ -1495,12 +1523,35 @@ function Assistant({
             {m.role === 'assistant' && (
               <span className="message-label">
                 <Sparkles size={13} />
-                {m.mode === 'live' ? 'TRUEFORGE AGENT' : 'SOURCE SEARCH'}
+                {m.answerType === 'plan_guidance'
+                  ? 'PLAN GUIDANCE'
+                  : m.answerType === 'discharge_summary'
+                    ? 'DISCHARGE SUMMARY'
+                  : m.mode === 'live'
+                    ? 'TRUEFORGE AGENT'
+                    : 'SOURCE SEARCH'}
               </span>
             )}
+            {m.role === 'assistant' && m.agentRole && (
+              <p className="specialist-label">
+                {roleLabels[m.agentRole]} · {m.execution === 'trueforge' ? 'Model-assisted source selection' : m.execution === 'local_fallback' ? 'Saved-record fallback' : 'Saved records · no model'}
+              </p>
+            )}
+            {m.notice && <p className="guidance-history-note">{m.notice}</p>}
             <div className="message-text">
-              <Markdown text={m.text} />
+              {m.role === 'assistant' && (m.mode === 'source-search' || ['grounded_answer', 'discharge_summary'].includes(m.answerType))
+                ? <div className="source-answer">{m.text}</div>
+                : <Markdown text={m.text} />}
             </div>
+            {m.answerType === 'plan_guidance' && guidance &&
+              JSON.stringify(m.guidance) !== JSON.stringify(guidance) && (
+                <p className="guidance-history-note">
+                  Your plan has changed since this answer. Ask for your next step again.
+                </p>
+              )}
+            {m.summary && summaryVersion && m.summary.version !== summaryVersion && (
+              <p className="guidance-history-note">Your records have changed since this summary. Open the current summary to review them.</p>
+            )}
             {m.citations?.map((c, n) => (
               <button className="citation-chip" key={n} onClick={() => onSource(c)}>
                 <Link2 size={12} />[{n + 1}] {c.heading}
@@ -1512,14 +1563,19 @@ function Assistant({
                 {m.metrics?.total_tokens !== undefined && ` · ${m.metrics.total_tokens} tokens`}
               </div>
             )}
+            {m.education && (
+              <section className="message-education" aria-label="General education">
+                <strong>General education · MedlinePlus</strong>
+                <p>These resources do not change your discharge instructions.</p>
+                <ul>{m.education.links.map((link) => <li key={link.url}><a href={link.url} target="_blank" rel="noreferrer">{link.title}</a></li>)}</ul>
+              </section>
+            )}
           </div>
         ))}
         {busy && (
           <div className="chat-thinking">
             <LoaderCircle className="spin" size={16} />
-            {mode === 'live'
-              ? 'TrueForge is working with your care tools…'
-              : 'Finding source passages…'}
+            Reading your plan and source records…
           </div>
         )}
         {error && (
@@ -1584,8 +1640,8 @@ function Assistant({
         Based on your records. Actions always need your approval.
       </div>
       <p className="chat-footnote">
-        Each question starts a fresh run. For changes to your care or new symptoms, contact your
-        care team.
+        Next-step guidance reads your saved plan without a model. Other live questions start a
+        fresh run. For changes to your care or new symptoms, contact your care team.
       </p>
     </section>
   );
@@ -1684,7 +1740,7 @@ function Harness({ status, onReset }) {
     const timer = setInterval(load, 5000);
     return () => clearInterval(timer);
   }, []);
-  const runs = traces.filter((t) => t.event === 'agent.completed');
+  const runs = traces.filter((t) => ['agent.completed', 'agent.output_rejected'].includes(t.event));
   const tokens = runs.reduce((n, t) => n + (t.metrics?.total_tokens || 0), 0);
   const costs = runs.filter((t) => t.metrics?.total_cost_in_usd != null);
   return (
@@ -1731,9 +1787,9 @@ function Harness({ status, onReset }) {
       <div className="stat-grid">
         <Stat
           icon={Activity}
-          label="Live runs completed"
+          label="Live turns returned"
           value={runs.length}
-          detail="Actual TrueForge responses"
+          detail="Includes responses replaced by safe fallbacks"
         />
         <Stat
           icon={Zap}

@@ -24,8 +24,8 @@ For development, use `npm run dev`: the React UI runs on **http://localhost:5173
 
 1. Start TrueForge in a separate terminal: `npx @truefoundry/trueforge@latest`.
 2. Open **http://localhost:8790 → Settings → Models**. Configure the event-provided model access. If the event provides a compatible AI Gateway, use its base URL, key, and exact model ID in a custom provider. Credentials stay in TrueForge, not this repository or the browser.
-3. Keep Homeward running and execute **`npm run setup:trueforge`**. This registers patient-scoped MCP connectors for all seeded patients and, when a model is configured, saves an example Homeward agent. Existing connectors are preserved; a conflicting URL requires manual review.
-4. Open **Ask Homeward → TrueForge agent**. The app starts a real TrueForge session with a patient-bound MCP connector and displays the returned answer. Each question starts a fresh session.
+3. Keep Homeward running and execute **`npm run setup:trueforge`**. This registers the legacy patient connectors and, when a model is configured, four patient/role-scoped connectors and saved agent definitions per seeded patient. Existing definitions and credentials are preserved; a conflicting connector URL requires manual review.
+4. Open **Ask Homeward → TrueForge agent**. A coordinator routes requests to the discharge summarizer, questions specialist, reminder assistant, or care-plan coordinator using separate native AgentSpecs and role-scoped MCP tools. Recognized next-step questions stay local in either mode. **My discharge summary** works without a model; live summary requests fall back to recorded sources when unavailable. Other live questions each start a fresh session.
 
 Manual connector setup for Alex:
 
@@ -40,11 +40,17 @@ The convenience endpoint **`http://localhost:8000/mcp`** is also scoped to Alex.
 
 To select a specific configured model, copy `.env.example` to `.env` and set `TRUEFORGE_MODEL` to its fully qualified `provider/model` name. Optional `TRUEFORGE_URL` and `TRUEFORGE_TOKEN` configure the server connection. **Never commit `.env` or credentials.**
 
+For future **OpenAI** access, configure the provider/key in TrueForge Settings → Models or your approved TrueFoundry AI Gateway, then select the exact available model FQN. Homeward does not need an `OPENAI_API_KEY` or a direct OpenAI client. All specialists use the same provider-independent selection; an unavailable override is reported instead of silently switching models. See [the agent-team contract and capability register](docs/AGENT-TEAM.md).
+
 The app uses TrueForge's HTTP API and MCP execution. Gateway routing, provider failover, and dollar-denominated hard limits are **not implemented by Homeward**. Use the event's gateway configuration if these are required. The local harness enforces iteration, time, and request-count limits and shows actual metrics returned by TrueForge.
 
 ## What works
 
 - **Patient recovery plan:** sourced tasks, known deadlines, clarification items, patient-reported completion, and persistent state.
+- **Next-step guidance:** “What is my next step?” agrees with the dashboard's earliest eligible recorded deadline. Undated, paused, clarification, and inactive tasks remain distinct. Exact citations, reviewed instructions, and date provenance are preserved; asking does not create an action. See [the guidance contract and TrueForge capability record](docs/NEXT-STEP-GUIDANCE.md).
+- **Accessible discharge summary:** grouped recorded steps, missing details, reported completion, unreviewed passages, and historical context, with exact-source links and visible date provenance. Live specialists select references through native structured output; clinical instructions and receipts are rendered from validated records rather than unrestricted model prose.
+- **Agent team:** four task-routed specialists with role-specific prompts and server-enforced MCP inventories. The patient sees the responsible role and whether a result used a model, saved records, or a fallback. One specialist handles each live request; dynamic subagents are not enabled.
+- **Emergency call control:** a persistent native `tel:911` link labeled for the US synthetic demo, independent of plan/API/model readiness. It is a user-controlled device action, not agent dispatch.
 - **Discharge record import:** text-based PDFs, TXT/Markdown files, and pasted text. Passages become searchable; exact cited instructions can be added for human review. Scanned-image OCR is not included.
 - **Retrieval:** deterministic lexical passage search locally; a connected TrueForge agent can retrieve passages and answer with their context. No vector database or embedding service is required for this small corpus.
 - **Approval-controlled reminders:** propose, approve or decline, execute, and download a real `.ics` calendar file. Local reminder creation is not an appointment booking, email, SMS, or scheduled notification service.
@@ -58,7 +64,8 @@ The app uses TrueForge's HTTP API and MCP execution. Gateway routing, provider f
 
 | Tool                            | Purpose                                                        |
 | ------------------------------- | -------------------------------------------------------------- |
-| `get_discharge_plan`            | Read the bound patient's tasks, source records, and actions    |
+| `get_discharge_plan`            | Read the bound patient's tasks, sources, actions, and next-step guidance |
+| `get_discharge_summary`         | Read a grouped, source-linked summary without approving or altering instructions |
 | `search_discharge_instructions` | Return relevant exact passages with source identifiers         |
 | `propose_cited_task`            | Add an exact passage for review; never infer a deadline        |
 | `propose_reminder`              | Create an approval request for a known dated task              |
@@ -66,6 +73,11 @@ The app uses TrueForge's HTTP API and MCP execution. Gateway routing, provider f
 | `lookup_patient_education`      | Retrieve general educational links without patient identifiers |
 
 There is deliberately **no approval tool**. Approval happens through the app UI/API; an agent cannot approve its own action using the exposed MCP tools. The demo's local API is not user-authenticated, so this boundary is a tool-permission boundary, not a production identity system.
+
+The legacy patient endpoints expose these seven tools. Specialist endpoints at
+`/mcp/:patientId/:role` expose only the role's subset; the summarizer and questions
+specialist cannot propose or execute reminders. Review and help-resolution endpoints
+remain human-only application operations.
 
 ## Architecture
 
@@ -96,6 +108,10 @@ npm run build
 `npm run eval` writes `.local/evaluation.json`; the Agent activity screen reads that report. Results are generated by running the checks, not hardcoded. Tests use separate in-memory or temporary databases and do not reset your local demo.
 
 Once a model is connected and the app is running, **`npm run smoke:trueforge`** performs a real model/tool run. This uses your configured model and may consume event credits. Review the response and trace; automated runtime checks are not a substitute for clinical evaluation.
+
+Use `npm run smoke:trueforge -- --summary` to exercise the summarizer. The smoke
+script requires a verified model-assisted result, not a local fallback, and reports
+the actual role, session ID, citations, and available usage metrics.
 
 GitHub Actions runs the tests, evaluation, and production build on pushes and pull requests. See [the demo script](docs/DEMO.md), [team ownership](docs/TEAM.md), [validation notes](docs/VALIDATION.md), and the [dataset and agent integration guide](docs/DATASET-AND-AGENT-INTEGRATION-GUIDE.md).
 
