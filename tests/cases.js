@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import { Store } from '../server/store.js';
 import { sourceSearch, agentSpec } from '../server/trueforge.js';
+import { reviewCases } from './review-cases.js';
 
 export const cases = [
+  ...reviewCases,
   [
     'Every fixture task has an exact source',
     (store) => {

@@ -49,6 +49,16 @@ export function createApp(store) {
     const { requested } = z.object({ requested: z.boolean() }).parse(req.body);
     res.json(store.requestHelp(req.params.id, req.params.taskId, requested));
   });
+  // Local human UI operations. Deliberately absent from the MCP tool registry.
+  app.post('/api/patients/:id/tasks/:taskId/reviews', (req, res) =>
+    res.json(store.reviewTask(req.params.id, req.params.taskId, req.body)),
+  );
+  app.post('/api/patients/:id/tasks/:taskId/help/responses', (req, res) =>
+    res.json(store.respondToHelp(req.params.id, req.params.taskId, req.body)),
+  );
+  app.get('/api/patients/:id/tasks/:taskId/history', (req, res) =>
+    res.json(store.taskHistory(req.params.id, req.params.taskId)),
+  );
   app.post('/api/patients/:id/documents', async (req, res) => {
     const input = z
       .object({
@@ -195,6 +205,11 @@ export function createApp(store) {
           : status === 500
             ? 'Something went wrong. Check the local server logs.'
             : error.message,
+      ...(error instanceof z.ZodError
+        ? { code: 'INVALID_REQUEST' }
+        : error instanceof AppError && error.code
+          ? { code: error.code, ...error.details }
+          : {}),
     });
     if (status === 500) console.error(error);
   });
