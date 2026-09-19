@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 160" width="1200" height="160" role="img" aria-labelledby="title desc">
+  <title id="title">Homeward</title>
+  <desc id="desc">Homeward's lowercase wordmark and blue period beside its white heart-pulse mark on a blue rounded square.</desc>
+  <rect width="1200" height="160" fill="#ffffff"/>
+  <rect x="64" y="48" width="62" height="64" rx="17" fill="#2563eb"/>
+  <!-- HeartPulse geometry matches the application's Lucide icon (ISC license). -->
+  <g transform="translate(75 60) scale(1.666667)" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+    <path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/>
+  </g>
+  <text x="144" y="99" font-family="Manrope, 'DM Sans', 'Segoe UI', Arial, sans-serif" font-size="50" font-weight="800" letter-spacing="-2.4" fill="#172033">homeward<tspan fill="#2563eb">.</tspan></text>
+</svg>
