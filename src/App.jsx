@@ -147,6 +147,80 @@ function Modal({ title, children, onClose, wide = false, dismissible = true }) {
   );
 }
 
+function renderInline(text) {
+  const parts = text.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      return <em key={index}>{part.slice(1, -1)}</em>;
+    }
+    if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+      return <code key={index}>{part.slice(1, -1)}</code>;
+    }
+    return part;
+  });
+}
+
+function Markdown({ text }) {
+  if (!text) return null;
+  const lines = text.split(/\r?\n/);
+  const blocks = [];
+  let currentList = null;
+  let currentParagraph = [];
+
+  const pushParagraph = () => {
+    if (currentParagraph.length > 0) {
+      blocks.push({ type: 'p', content: currentParagraph.join('\n') });
+      currentParagraph = [];
+    }
+  };
+
+  for (const line of lines) {
+    if (line.trim().match(/^[-*]\s/)) {
+      pushParagraph();
+      if (!currentList) currentList = [];
+      currentList.push(line.replace(/^[-*]\s+/, ''));
+    } else {
+      if (currentList) {
+        blocks.push({ type: 'ul', items: currentList });
+        currentList = null;
+      }
+      if (line.trim() === '') {
+        pushParagraph();
+      } else {
+        currentParagraph.push(line);
+      }
+    }
+  }
+  pushParagraph();
+  if (currentList) {
+    blocks.push({ type: 'ul', items: currentList });
+  }
+
+  return (
+    <div className="markdown-body">
+      {blocks.map((block, i) => {
+        if (block.type === 'ul') {
+          return (
+            <ul key={i} className="markdown-list">
+              {block.items.map((item, j) => (
+                <li key={j}>{renderInline(item)}</li>
+              ))}
+            </ul>
+          );
+        }
+        return (
+          <p key={i} className="markdown-p">
+            {renderInline(block.content)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function App() {
   const [view, setView] = useState('plan');
   const [menuCollapsed, setMenuCollapsed] = useState(() => {
@@ -1424,7 +1498,9 @@ function Assistant({
                 {m.mode === 'live' ? 'TRUEFORGE AGENT' : 'SOURCE SEARCH'}
               </span>
             )}
-            <div className="message-text">{m.text}</div>
+            <div className="message-text">
+              <Markdown text={m.text} />
+            </div>
             {m.citations?.map((c, n) => (
               <button className="citation-chip" key={n} onClick={() => onSource(c)}>
                 <Link2 size={12} />[{n + 1}] {c.heading}
