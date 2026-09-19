@@ -1,0 +1,23 @@
+sequenceDiagram
+  actor Patient
+  participant UI as Browser
+  participant API as Express
+  participant TF as TrueForge
+  participant Tools as Patient-bound MCP
+  participant DB as SQLite
+  Patient->>UI: Ask a discharge question
+  UI->>API: Chat request with explicit mode
+  alt Local guidance, summary, or source search
+    API->>DB: Read and validate current patient records
+    API-->>UI: Guidance, grouped summary, or exact excerpts
+  else Live agent configured
+    API->>TF: Route one specialist with bounded role tools
+    TF->>Tools: Model-selected tool calls
+    Tools->>DB: Scoped reads or validated proposals
+    DB-->>Tools: Records or outcomes
+    Tools-->>TF: Tool results
+    TF-->>API: Structured reference selection or failure
+    API->>DB: Validate scope and unchanged record snapshot
+    API-->>UI: Reconstructed answer, labeled local fallback, or error
+  end
+  API->>DB: Record retrieval or agent trace

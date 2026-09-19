@@ -1,0 +1,38 @@
+
+> homeward-discharge-copilot@1.0.0 eval
+> node scripts/evaluate.js
+
+PASS Discharge summaries are source-linked, patient-scoped reads with explicit missing dates
+PASS Summaries keep unreviewed and Synthea passages separate from actionable instructions
+PASS Summary snapshots follow review/help changes without rewriting original instructions
+PASS Agent references cannot inject clinical prose, cross patients, or invent action receipts
+PASS Next-step chat and plan agree for every seeded patient without clinical mutations
+PASS Guidance distinguishes undated, paused, clarification, completed, and rejected tasks
+PASS Guidance uses reviewed instructions and labels human dates without rewriting exact quotes
+PASS Guidance fails closed on invalid citations, historical instructions, and invalid dates
+PASS Next-step recognition is bounded and specific source search preserves punctuation
+PASS Guidance has stable date ordering and does not bypass reminder approval or help gates
+PASS Review activates an exact instruction with an evidenced date and separate reminder approval
+PASS Review with no deadline leaves due null and prevents reminders
+PASS Clarify and reject preserve sources and cannot be bypassed by completion or a duplicate proposal
+PASS Synthea history requires a separate exact instruction; a review note cannot authorize it
+PASS Invalid calendar dates and unsupported date evidence never mutate the task
+PASS Review commands reject foreign tasks, foreign evidence, fabricated quotes, and reviewer impersonation
+PASS Review retries replay one receipt; stale revisions and reused keys cannot overwrite newer decisions
+PASS A new reviewed instruction invalidates old reminders even when status and date are unchanged
+PASS Responding to and resolving help never approves an unverified task
+PASS Help persists after reopening SQLite and remains patient scoped
+PASS Every fixture task has an exact source
+PASS Unknown deadlines stay unknown
+PASS Execution without approval is blocked
+PASS Patient boundaries reject foreign records
+PASS Retry after response loss creates no duplicate
+PASS Declined actions cannot execute
+PASS Fabricated citations are rejected
+PASS Imported instructions require human review
+PASS Missing answers are not invented
+PASS Changed tasks invalidate pending execution
+PASS Repeated proposals reuse the existing action
+PASS Agent runs have bounded tool access and iterations
+
+32/32 checks passed. Report: .local/evaluation.json

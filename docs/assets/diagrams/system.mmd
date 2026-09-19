@@ -1,0 +1,17 @@
+flowchart LR
+  UI[React patient and care-team browser] --> API[Express local API]
+  API --> DB[(SQLite records and audit)]
+  API --> Search[Lexical source search]
+  Search --> DB
+  API --> Router[Deterministic role router]
+  Router --> TF[TrueForge runtime]
+  API --> Summary[Recorded summary and guidance]
+  Summary --> DB
+  TF --> Validate[Reference and snapshot validation]
+  Validate --> API
+  TF --> Model[Configured model or gateway]
+  TF --> MCP[Patient-bound MCP endpoint]
+  MCP --> DB
+  MCP --> Edu[MedlinePlus education]
+  API --> Edu
+  API --> ICS[Downloadable calendar file]

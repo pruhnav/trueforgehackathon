@@ -1,0 +1,217 @@
+{
+  "commit": "eaf86d9ac1f72dd7b59b52b1263a131b307e0b8a",
+  "dirty": true,
+  "node": "v24.16.0",
+  "evaluatedFiles": {
+    "data/synthea-sample.json": "46ec21d276045c8cfb3bc6dbddc17f60890399d807e327ea96ad4419a5b3c4b4",
+    "package-lock.json": "68e317bda5a12afdd1b1dcb401f9840696bf926ad6e61d999b5c745e2c8e078c",
+    "package.json": "dad5861b651915943a6e84dd700db8342368d748b894ff136ef65e86a504cf09",
+    "scripts/evaluate-live.js": "c1a1f7b8c16930f8049696d82b175782081bc6c6feb4c9a1bcb0792948b81a4e",
+    "scripts/evaluate.js": "9ee7be0970e0b363bd927b95edda0571367344e83743742c90bdf8ce0a2289b6",
+    "scripts/evaluations/assess.js": "01a338aff6ac9abeb711bd589bd50b97ae4b3bc885b680698d64b637b9b15967",
+    "scripts/evaluations/browser-journey.js": "3cce5ef571ac069d984ccfaf59eaa91891723b15351afc2b94ba2c88720a5b53",
+    "scripts/evaluations/metadata.js": "264846901cf24cd5827f02bd9872a73b02caac595d7f4190c285b61f03d0d796",
+    "scripts/evaluations/scenarios.js": "876bb3bc43808f2404a882e3a519015f86bba14b7873e84c4aa4c9c5f16fdbc3",
+    "scripts/ingest-synthea.py": "3b4b1e4f1a3e00c4a873a1fffc3097c41ab94bf32d2c01445733ee554e43cc1f",
+    "scripts/setup-trueforge.js": "f9529298989f71e40bab2d9cd8d64b67b4e4e801ded6a55145b80c4c82bbf575",
+    "scripts/smoke-trueforge.js": "f3f957b1dafd4553627f2452318a310eda67016fbf31fd18813974fbedb9adcc",
+    "server/agent-responses.js": "d6340da1d061318ffa7497ee565d44c9ab672a2c553675eef3db43eb2df2192a",
+    "server/agents.js": "9f2087e21ef4022c40856ff4a9cb7f946b2bdc33e8da7e11fabbd89c62f0ed5b",
+    "server/app.js": "174e959b28efecc67d89af6b97df352421b3c838e23a15bf64ff3ca66ae983ae",
+    "server/education.js": "0340a1e9c286bc453c94be6fa7ca71da6c2f9ad2fbc850bd434f4cd16f42ccf1",
+    "server/fixtures.js": "cb340f562ba8d09c326c771f9698d1e222d68cd6e9ad1e1f1254aa0f1c53f8e9",
+    "server/guidance.js": "5001c6c36f64b24893ba10d0d744bbb7db4191b0b84eef42d63958f544cc9591",
+    "server/index.js": "e243426f6983d4c1277cc7d62d8ca0545b1a4021b687b4e36aeb3d30a4831ff7",
+    "server/mcp.js": "b29c1bfbde7bbed9126f6132b4b9d88ab1a3bf28f0116d184ed63d81bb423b23",
+    "server/store.js": "fab80902ebe0692f72d92fea3f338a36beae89e5928f7078b97ed0d4a2e7f48e",
+    "server/summary.js": "6ba80a21e1d1d18f49c44756af8a4eff140e14cf06b1b0c1a3fd139478b8959e",
+    "server/trueforge.js": "9f5880c5a977287fce944e7afaf066423e3334eef766f5cf8fe9fb220a3fb673",
+    "tests/agent-team.test.js": "e9bad8af08b9b141009ce9887b4988a6f924acf3926d969eafc9bf7e5ea0bd77",
+    "tests/cases.js": "17c5c0947d008a51ed53e600968806824413dbfd41230bd5695d22e0b3fa9285",
+    "tests/domain.test.js": "6f51a1f03701a2b2fe9a983da7a4a7befcbd07befa678aabb56703089cf450db",
+    "tests/education.test.js": "19d27c9cf0f0668a947dd73338f5552cc7817f586049154da70731872cc35b0f",
+    "tests/evaluation-harness.test.js": "eb55ddce29206a5d582338cf7e9597d84c23b1a8e17c6df9db9e94e3406ac302",
+    "tests/guidance-cases.js": "b4923b7f2c26d2f3bbfee5161711c1e28090feb447ffc0076911caf3d0271b85",
+    "tests/guidance-ui.test.jsx": "3ee99242f5164d5b183d8e625478e8dc47c0ef4967e0e3f5b4a4553021ad9faf",
+    "tests/guidance.test.js": "9b23659b41c6c9711c50b45183189a712ed3f409281b0b06962563527e4fddad",
+    "tests/http.test.js": "e827a5f138fbd15dcba48f93c1193348c70fe17a0fd2f831e2f9f2438668923d",
+    "tests/review-cases.js": "8fdf09ea0bd1c915c349e5be9c420de3df6c6bf80d00e50970d9a20aad214fd8",
+    "tests/review-http.test.js": "a80ff2bad4e60c9ff887df1faeb7c455d4a9ad946eb8e862327b3fe52146fb14",
+    "tests/review-ui.test.jsx": "73bc2c2b20a2a02ca13b31cef2cb61d26647cbd9227c164697195d4d18335a51",
+    "tests/review.test.js": "b5c81dcdbc84831056c608dc1dace8462092580f164d67277d069e76605f5a37",
+    "tests/summary-cases.js": "742c561261b0aed4b09453eb1afd92ac561496b99e03730e5ba6db27edd1db16",
+    "tests/summary-ui.test.jsx": "bb98b4219d8637a7bc208da6770617552ddd45e98f600398ff4a670f7763f2e1",
+    "tests/synthea-help.test.js": "1bff88d6ec319e5181120b934e2b22d29f13be9faadb18536f577be29e8d7dfa",
+    "tests/trueforge.test.js": "8739558ef5391f2391ed1a63c86466c670302a32d1f1d3a4681fa0803c78d8e7",
+    "tests/ui.test.jsx": "3f187ec05fa77e24540f6466b6c7bc1a75fd198f4b2bdb3225dccd9fe8d823bf"
+  },
+  "ranAt": "2026-09-19T22:53:15.671Z",
+  "type": "deterministic-runtime-guardrails",
+  "cases": [
+    {
+      "name": "Discharge summaries are source-linked, patient-scoped reads with explicit missing dates",
+      "passed": true,
+      "durationMs": 13
+    },
+    {
+      "name": "Summaries keep unreviewed and Synthea passages separate from actionable instructions",
+      "passed": true,
+      "durationMs": 2
+    },
+    {
+      "name": "Summary snapshots follow review/help changes without rewriting original instructions",
+      "passed": true,
+      "durationMs": 6
+    },
+    {
+      "name": "Agent references cannot inject clinical prose, cross patients, or invent action receipts",
+      "passed": true,
+      "durationMs": 6
+    },
+    {
+      "name": "Next-step chat and plan agree for every seeded patient without clinical mutations",
+      "passed": true,
+      "durationMs": 3
+    },
+    {
+      "name": "Guidance distinguishes undated, paused, clarification, completed, and rejected tasks",
+      "passed": true,
+      "durationMs": 2
+    },
+    {
+      "name": "Guidance uses reviewed instructions and labels human dates without rewriting exact quotes",
+      "passed": true,
+      "durationMs": 4
+    },
+    {
+      "name": "Guidance fails closed on invalid citations, historical instructions, and invalid dates",
+      "passed": true,
+      "durationMs": 5
+    },
+    {
+      "name": "Next-step recognition is bounded and specific source search preserves punctuation",
+      "passed": true,
+      "durationMs": 5
+    },
+    {
+      "name": "Guidance has stable date ordering and does not bypass reminder approval or help gates",
+      "passed": true,
+      "durationMs": 5
+    },
+    {
+      "name": "Review activates an exact instruction with an evidenced date and separate reminder approval",
+      "passed": true,
+      "durationMs": 2
+    },
+    {
+      "name": "Review with no deadline leaves due null and prevents reminders",
+      "passed": true,
+      "durationMs": 5
+    },
+    {
+      "name": "Clarify and reject preserve sources and cannot be bypassed by completion or a duplicate proposal",
+      "passed": true,
+      "durationMs": 5
+    },
+    {
+      "name": "Synthea history requires a separate exact instruction; a review note cannot authorize it",
+      "passed": true,
+      "durationMs": 3
+    },
+    {
+      "name": "Invalid calendar dates and unsupported date evidence never mutate the task",
+      "passed": true,
+      "durationMs": 5
+    },
+    {
+      "name": "Review commands reject foreign tasks, foreign evidence, fabricated quotes, and reviewer impersonation",
+      "passed": true,
+      "durationMs": 3
+    },
+    {
+      "name": "Review retries replay one receipt; stale revisions and reused keys cannot overwrite newer decisions",
+      "passed": true,
+      "durationMs": 4
+    },
+    {
+      "name": "A new reviewed instruction invalidates old reminders even when status and date are unchanged",
+      "passed": true,
+      "durationMs": 9
+    },
+    {
+      "name": "Responding to and resolving help never approves an unverified task",
+      "passed": true,
+      "durationMs": 3
+    },
+    {
+      "name": "Help persists after reopening SQLite and remains patient scoped",
+      "passed": true,
+      "durationMs": 33
+    },
+    {
+      "name": "Every fixture task has an exact source",
+      "passed": true,
+      "durationMs": 2
+    },
+    {
+      "name": "Unknown deadlines stay unknown",
+      "passed": true,
+      "durationMs": 1
+    },
+    {
+      "name": "Execution without approval is blocked",
+      "passed": true,
+      "durationMs": 2
+    },
+    {
+      "name": "Patient boundaries reject foreign records",
+      "passed": true,
+      "durationMs": 1
+    },
+    {
+      "name": "Retry after response loss creates no duplicate",
+      "passed": true,
+      "durationMs": 1
+    },
+    {
+      "name": "Declined actions cannot execute",
+      "passed": true,
+      "durationMs": 2
+    },
+    {
+      "name": "Fabricated citations are rejected",
+      "passed": true,
+      "durationMs": 1
+    },
+    {
+      "name": "Imported instructions require human review",
+      "passed": true,
+      "durationMs": 0
+    },
+    {
+      "name": "Missing answers are not invented",
+      "passed": true,
+      "durationMs": 1
+    },
+    {
+      "name": "Changed tasks invalidate pending execution",
+      "passed": true,
+      "durationMs": 1
+    },
+    {
+      "name": "Repeated proposals reuse the existing action",
+      "passed": true,
+      "durationMs": 1
+    },
+    {
+      "name": "Agent runs have bounded tool access and iterations",
+      "passed": true,
+      "durationMs": 1
+    }
+  ],
+  "summary": {
+    "passed": 32,
+    "failed": 0,
+    "total": 32
+  }
+}

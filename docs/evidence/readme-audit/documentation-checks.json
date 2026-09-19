@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-09-19T22:57:43.332Z",
+  "markdownFiles": [
+    "README.md",
+    "docs/SUBSYSTEM_ASSESSMENT.md",
+    "docs/PATIENT_JOURNEY.md",
+    "docs/assets/diagrams/README.md",
+    "docs/evidence/readme-audit/README.md"
+  ],
+  "relativeLinksChecked": 90,
+  "commitPinnedLinksChecked": 19,
+  "errors": [],
+  "diagramSourcesSynchronized": true,
+  "renderedDiagramsChecked": false
+}
