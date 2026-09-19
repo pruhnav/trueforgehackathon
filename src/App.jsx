@@ -29,8 +29,9 @@ import {
   Link2,
   Zap,
   Download,
-  PanelRightClose,
   LoaderCircle,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 
 async function api(path, options = {}) {
@@ -117,6 +118,28 @@ function Modal({ title, children, onClose, wide = false }) {
 
 export default function App() {
   const [view, setView] = useState('plan');
+  const [menuCollapsed, setMenuCollapsed] = useState(() => {
+    try {
+      const saved = window.localStorage.getItem('homeward.menuCollapsed');
+      return saved === null ? window.innerWidth < 900 : saved === 'true';
+    } catch {
+      return window.innerWidth < 900;
+    }
+  });
+  const assistantInputRef = useRef(null);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('homeward.menuCollapsed', String(menuCollapsed));
+    } catch {
+      /* Storage may be disabled. */
+    }
+  }, [menuCollapsed]);
+  function focusAssistant() {
+    assistantInputRef.current
+      ?.closest('.agent-dock')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    assistantInputRef.current?.focus({ preventScroll: true });
+  }
   const [patientId, setPatientId] = useState('demo-001');
   const activePatientId = useRef(patientId);
   activePatientId.current = patientId;
@@ -127,7 +150,6 @@ export default function App() {
   const [toast, setToast] = useState('');
   const [source, setSource] = useState(null);
   const [importOpen, setImportOpen] = useState(false);
-  const [assistantOpen, setAssistantOpen] = useState(false);
   const [action, setAction] = useState(null);
   const [busy, setBusy] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
@@ -184,7 +206,7 @@ export default function App() {
   const done = plan?.tasks.filter((t) => t.status === 'completed').length || 0;
   const pendingApprovals = plan?.actions.filter((a) => a.status === 'proposed').length || 0;
   const nextTask = plan?.tasks
-    .filter((task) => task.status === 'pending' && task.due)
+    .filter((task) => task.status === 'pending' && task.due && !task.helpRequestedAt)
     .sort((a, b) => a.due.localeCompare(b.due))[0];
   const titles = {
     plan: 'My recovery',
@@ -195,8 +217,15 @@ export default function App() {
   };
 
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
+    <div className={`app-shell split-layout ${menuCollapsed ? 'menu-collapsed' : 'menu-expanded'}`}>
+      {!menuCollapsed && (
+        <button
+          className="menu-scrim"
+          aria-label="Close menu"
+          onClick={() => setMenuCollapsed(true)}
+        />
+      )}
+      <aside className="sidebar" id="primary-sidebar" aria-label="Application menu">
         <a
           className="brand"
           href="#"
@@ -223,6 +252,8 @@ export default function App() {
             <button
               key={key}
               className={`nav-item ${view === key ? 'active' : ''}`}
+              aria-label={title}
+              title={title}
               onClick={() => setView(key)}
             >
               <Icon size={19} />
@@ -230,11 +261,22 @@ export default function App() {
               {key === 'plan' && <span className="nav-count">{plan?.tasks.length || 0}</span>}
             </button>
           ))}
+          <button
+            className="nav-item"
+            aria-label="Focus discharge assistant"
+            title="Discharge assistant"
+            onClick={focusAssistant}
+          >
+            <Sparkles size={19} />
+            <span>Discharge assistant</span>
+          </button>
         </nav>
         <div className="sidebar-divider" />
         <div className="workspace-label">BEHIND THE CARE</div>
         <button
           className={`nav-item ${view === 'harness' ? 'active' : ''}`}
+          aria-label="Agent activity"
+          title="Agent activity"
           onClick={() => setView('harness')}
         >
           <Activity size={19} />
@@ -265,10 +307,20 @@ export default function App() {
       </aside>
       <div className="workspace">
         <header className="topbar">
-          <div className="breadcrumb">
-            <span>Homeward</span>
-            <ChevronRight size={14} />
-            <strong>{titles[view]}</strong>
+          <div className="topbar-navigation">
+            <IconButton
+              label={menuCollapsed ? 'Expand menu' : 'Collapse menu'}
+              aria-expanded={!menuCollapsed}
+              aria-controls="primary-sidebar"
+              onClick={() => setMenuCollapsed((value) => !value)}
+            >
+              {menuCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+            </IconButton>
+            <div className="breadcrumb">
+              <span>Homeward</span>
+              <ChevronRight size={14} />
+              <strong>{titles[view]}</strong>
+            </div>
           </div>
           <div className="topbar-right">
             <span className="demo-tag">
@@ -288,408 +340,459 @@ export default function App() {
             </IconButton>
           </div>
         </header>
-        <main>
-          {error && (
-            <div role="alert" className="error-banner">
-              <AlertCircle size={18} />
-              <span>{error}</span>
-              <IconButton label="Dismiss error" onClick={() => setError('')}>
-                <X size={16} />
-              </IconButton>
-            </div>
-          )}
-          {!plan ? (
-            <div className="loading-state">
-              <LoaderCircle className="spin" />
-              Loading your recovery plan…
-            </div>
-          ) : (
-            <>
-              {view === 'plan' && (
-                <>
-                  <div className="page-heading">
-                    <div>
-                      <div className="eyebrow">RECOVERY OVERVIEW</div>
-                      <h1>Your recovery, organized.</h1>
-                      <p>
-                        {plan.patient.name.split(' ')[0]}, here’s your plan. Track next steps and
-                        keep your care team in the loop.
-                      </p>
-                    </div>
-                    <button className="button secondary" onClick={() => setImportOpen(true)}>
-                      <Plus size={17} /> Add discharge record
-                    </button>
-                  </div>
-                  <section className="recovery-hero">
-                    <div className="hero-copy">
-                      <div className="hero-pill">
-                        <span /> {nextTask ? 'NEXT ON YOUR PLAN' : 'YOUR RECOVERY CHECKLIST'}
+        <div className="workspace-split">
+          <main aria-label="Care dashboard">
+            {error && (
+              <div role="alert" className="error-banner">
+                <AlertCircle size={18} />
+                <span>{error}</span>
+                <IconButton label="Dismiss error" onClick={() => setError('')}>
+                  <X size={16} />
+                </IconButton>
+              </div>
+            )}
+            {!plan ? (
+              <div className="loading-state">
+                <LoaderCircle className="spin" />
+                Loading your recovery plan…
+              </div>
+            ) : (
+              <>
+                {view === 'plan' && (
+                  <>
+                    <div className="page-heading">
+                      <div>
+                        <div className="eyebrow">RECOVERY OVERVIEW</div>
+                        <h1>Your recovery, organized.</h1>
+                        <p>
+                          {plan.patient.name.split(' ')[0]}, here’s your plan. Track next steps and
+                          keep your care team in the loop.
+                        </p>
                       </div>
-                      <h2>{nextTask ? nextTask.title : 'No dated tasks left to complete.'}</h2>
-                      <p>
-                        {nextTask
-                          ? 'One clear next step, backed by your discharge instructions.'
-                          : 'Review your checklist below for preparation and clarification items.'}
-                      </p>
-                      <button
-                        className="button hero-action"
-                        onClick={() => (nextTask ? showSource(nextTask) : setAssistantOpen(true))}
-                      >
-                        {nextTask ? 'Review instruction' : 'Ask Homeward'}{' '}
-                        <ArrowUpRight size={17} />
+                      <button className="button secondary" onClick={() => setImportOpen(true)}>
+                        <Plus size={17} /> Add discharge record
                       </button>
                     </div>
-                    <div className="focus-summary">
-                      <div className="focus-summary-label">
-                        <CalendarDays size={16} /> {nextTask ? 'DUE DATE' : 'PLAN PROGRESS'}
+                    <section className="recovery-hero">
+                      <div className="hero-copy">
+                        <div className="hero-pill">
+                          <span /> {nextTask ? 'NEXT ON YOUR PLAN' : 'YOUR RECOVERY CHECKLIST'}
+                        </div>
+                        <h2>{nextTask ? nextTask.title : 'No dated tasks left to complete.'}</h2>
+                        <p>
+                          {nextTask
+                            ? 'One clear next step, backed by your discharge instructions.'
+                            : 'Review your checklist below for preparation and clarification items.'}
+                        </p>
+                        <button
+                          className="button hero-action"
+                          onClick={() => (nextTask ? showSource(nextTask) : focusAssistant())}
+                        >
+                          {nextTask ? 'Review instruction' : 'Ask Homeward'}{' '}
+                          <ArrowUpRight size={17} />
+                        </button>
                       </div>
-                      <strong>
-                        {nextTask ? prettyDate(nextTask.due) : `${done} / ${plan.tasks.length}`}
-                      </strong>
-                      <span>
-                        {nextTask ? 'From your discharge record' : 'Tasks reported complete'}
-                      </span>
-                      <div className="focus-summary-footer">
-                        <Link2 size={13} /> Source-linked care plan
+                      <div className="focus-summary">
+                        <div className="focus-summary-label">
+                          <CalendarDays size={16} /> {nextTask ? 'DUE DATE' : 'PLAN PROGRESS'}
+                        </div>
+                        <strong>
+                          {nextTask ? prettyDate(nextTask.due) : `${done} / ${plan.tasks.length}`}
+                        </strong>
+                        <span>
+                          {nextTask ? 'From your discharge record' : 'Tasks reported complete'}
+                        </span>
+                        <div className="focus-summary-footer">
+                          <Link2 size={13} /> Source-linked care plan
+                        </div>
+                      </div>
+                    </section>
+                    <div className="stat-grid">
+                      <Stat
+                        icon={CheckCheck}
+                        label="Your next steps"
+                        value={`${done} of ${plan.tasks.length}`}
+                        detail="patient-reported complete"
+                        progress={done / plan.tasks.length}
+                      />
+                      <Stat
+                        icon={CalendarDays}
+                        label="Next follow-up"
+                        value={prettyDate(
+                          plan.tasks.find((t) => t.category === 'appointment')?.due,
+                        )}
+                        detail="Arrange a visit by this date"
+                      />
+                      <Stat
+                        icon={ShieldCheck}
+                        label="You’re in control"
+                        value={
+                          pendingApprovals ? `${pendingApprovals} to review` : 'Approval first'
+                        }
+                        detail="Actions wait for your permission"
+                      />
+                    </div>
+                    <div className="content-grid">
+                      <section className="card plan-card">
+                        <div className="section-heading">
+                          <div>
+                            <h2>
+                              Your next steps{' '}
+                              <span className="small-count">{plan.tasks.length}</span>
+                            </h2>
+                            <p>A manageable plan, straight from your discharge record.</p>
+                          </div>
+                          <span className="tiny-label">
+                            DISCHARGED {prettyDate(plan.patient.dischargedAt).toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="task-list">
+                          {plan.tasks.map((task) => {
+                            const Icon = categoryIcons[task.category];
+                            const completed = task.status === 'completed';
+                            const needsReview = task.status === 'needs_clarification';
+                            const saved = plan.actions.find(
+                              (a) => a.taskId === task.id && a.status === 'executed',
+                            );
+                            const overdue = task.due && task.due < plan.demoDate && !completed;
+                            return (
+                              <article
+                                className={`task ${completed ? 'completed' : ''}`}
+                                key={task.id}
+                              >
+                                <button
+                                  className={`task-check ${completed ? 'checked' : ''}`}
+                                  disabled={busy || needsReview || !!task.helpRequestedAt}
+                                  aria-label={`${completed ? 'Reopen' : 'Mark complete'}: ${task.title}`}
+                                  onClick={() =>
+                                    perform(
+                                      () =>
+                                        api(`/patients/${patientId}/tasks/${task.id}`, {
+                                          method: 'PATCH',
+                                          body: JSON.stringify({ complete: !completed }),
+                                        }),
+                                      completed
+                                        ? 'Task reopened.'
+                                        : 'Saved as patient-reported complete.',
+                                    )
+                                  }
+                                >
+                                  {completed && <Check size={14} />}
+                                </button>
+                                <div className={`task-icon ${task.category}`}>
+                                  <Icon size={19} />
+                                </div>
+                                <div className="task-body">
+                                  <div className="task-title-row">
+                                    <h3>{task.title}</h3>
+                                    {task.helpRequestedAt && (
+                                      <Badge tone="amber">Help requested</Badge>
+                                    )}
+                                    {needsReview && <Badge tone="amber">Needs clarification</Badge>}
+                                    {completed && <Badge tone="green">Complete</Badge>}
+                                  </div>
+                                  <p>{task.detail}</p>
+                                  <div className="task-meta">
+                                    <span className={overdue ? 'overdue' : ''}>
+                                      <Clock3 size={12} />
+                                      {task.due
+                                        ? `${overdue ? 'Overdue · ' : 'By '}${prettyDate(task.due)}`
+                                        : needsReview
+                                          ? 'No date specified'
+                                          : 'Before your visit'}
+                                    </span>
+                                    <span className="meta-dot">·</span>
+                                    <button
+                                      className="source-link"
+                                      onClick={() => showSource(task)}
+                                    >
+                                      <Link2 size={12} /> View source
+                                    </button>
+                                  </div>
+                                  {!completed && (
+                                    <button
+                                      className="text-button"
+                                      disabled={busy}
+                                      onClick={() =>
+                                        perform(
+                                          () =>
+                                            post(`/patients/${patientId}/tasks/${task.id}/help`, {
+                                              requested: !task.helpRequestedAt,
+                                            }),
+                                          task.helpRequestedAt
+                                            ? 'Help request cleared.'
+                                            : 'Flagged in the local care-team view. No message was sent.',
+                                        )
+                                      }
+                                    >
+                                      <CircleHelp size={14} />{' '}
+                                      {task.helpRequestedAt ? 'Clear help request' : 'Need help'}
+                                    </button>
+                                  )}
+                                  {saved && (
+                                    <a
+                                      className="saved-reminder"
+                                      href={`/api/patients/${patientId}/actions/${saved.id}/calendar`}
+                                    >
+                                      <CheckCircle2 size={13} /> Reminder ready{' '}
+                                      <Download size={12} />
+                                    </a>
+                                  )}
+                                </div>
+                                {!task.helpRequestedAt &&
+                                  !needsReview &&
+                                  !completed &&
+                                  task.due &&
+                                  !saved && (
+                                    <IconButton
+                                      label={`Set reminder for ${task.title}`}
+                                      onClick={() => remind(task)}
+                                      disabled={busy}
+                                    >
+                                      <Bell size={17} />
+                                    </IconButton>
+                                  )}
+                              </article>
+                            );
+                          })}
+                        </div>
+                        <div className="plan-footer">
+                          <ShieldCheck size={15} />
+                          <span>
+                            Every step links to its source. Missing details go to your care team.
+                          </span>
+                        </div>
+                      </section>
+                      <div className="right-column">
+                        <section className="card care-contact">
+                          <span className="eyebrow">YOUR FOLLOW-UP TEAM</span>
+                          <div className="doctor-row">
+                            <div className="doctor-avatar">
+                              <HeartPulse size={21} />
+                            </div>
+                            <div>
+                              <h3>{plan.patient.clinician}</h3>
+                              <p>Discharge care team · fictional</p>
+                            </div>
+                          </div>
+                          <div className="contact-note">
+                            <CircleHelp size={16} />
+                            <span>
+                              Unclear instructions? Keep a question ready for your next
+                              conversation.
+                            </span>
+                          </div>
+                          <button className="text-button" onClick={() => setView('team')}>
+                            View care-team overview <ArrowRight size={15} />
+                          </button>
+                        </section>
                       </div>
                     </div>
-                  </section>
-                  <div className="stat-grid">
-                    <Stat
-                      icon={CheckCheck}
-                      label="Your next steps"
-                      value={`${done} of ${plan.tasks.length}`}
-                      detail="patient-reported complete"
-                      progress={done / plan.tasks.length}
+                  </>
+                )}
+                {view === 'team' && (
+                  <>
+                    <PageTitle
+                      eyebrow="A SHARED PICTURE"
+                      title="No next step left unseen."
+                      subtitle="A demo care-team overview of follow-through, open questions, and approvals."
                     />
-                    <Stat
-                      icon={CalendarDays}
-                      label="Next follow-up"
-                      value={prettyDate(plan.tasks.find((t) => t.category === 'appointment')?.due)}
-                      detail="Arrange a visit by this date"
-                    />
-                    <Stat
-                      icon={ShieldCheck}
-                      label="You’re in control"
-                      value={pendingApprovals ? `${pendingApprovals} to review` : 'Approval first'}
-                      detail="Actions wait for your permission"
-                    />
-                  </div>
-                  <div className="content-grid">
-                    <section className="card plan-card">
+                    <div className="stat-grid">
+                      <Stat
+                        icon={Users}
+                        label="Demo patients"
+                        value={patients.length}
+                        detail="Synthetic records only"
+                      />
+                      <Stat
+                        icon={CircleHelp}
+                        label="Needs clarification"
+                        value={
+                          patients
+                            .flatMap((p) => p.tasks)
+                            .filter((t) => t.status === 'needs_clarification').length
+                        }
+                        detail="Instructions awaiting care-team review"
+                      />
+                      <Stat
+                        icon={Clock3}
+                        label="Overdue steps"
+                        value={
+                          patients
+                            .flatMap((p) => p.tasks)
+                            .filter((t) => t.due && t.due < plan.demoDate && t.status === 'pending')
+                            .length
+                        }
+                        detail="As of the demo date: September 19"
+                      />
+                    </div>
+                    <section className="card">
                       <div className="section-heading">
-                        <div>
-                          <h2>
-                            Your next steps <span className="small-count">{plan.tasks.length}</span>
-                          </h2>
-                          <p>A manageable plan, straight from your discharge record.</p>
-                        </div>
-                        <span className="tiny-label">
-                          DISCHARGED {prettyDate(plan.patient.dischargedAt).toUpperCase()}
-                        </span>
+                        <h2>Patient follow-through</h2>
+                        <Badge>Synthetic cohort</Badge>
                       </div>
-                      <div className="task-list">
-                        {plan.tasks.map((task) => {
-                          const Icon = categoryIcons[task.category];
-                          const completed = task.status === 'completed';
-                          const needsReview = task.status === 'needs_clarification';
-                          const saved = plan.actions.find(
-                            (a) => a.taskId === task.id && a.status === 'executed',
+                      <div className="patient-table">
+                        <div className="patient-table-header">
+                          <span>Patient</span>
+                          <span>Progress</span>
+                          <span>Attention</span>
+                          <span />
+                        </div>
+                        {patients.map((p) => {
+                          const count = p.tasks.filter((t) => t.status === 'completed').length;
+                          const late = p.tasks.some(
+                            (t) => t.due && t.due < plan.demoDate && t.status === 'pending',
                           );
-                          const overdue = task.due && task.due < plan.demoDate && !completed;
+                          const help = p.tasks.some((t) => t.helpRequestedAt);
+                          const review =
+                            help || p.tasks.some((t) => t.status === 'needs_clarification');
                           return (
-                            <article
-                              className={`task ${completed ? 'completed' : ''}`}
-                              key={task.id}
+                            <button
+                              className="patient-row"
+                              key={p.id}
+                              onClick={() => {
+                                setPatientId(p.id);
+                                setView('plan');
+                              }}
                             >
-                              <button
-                                className={`task-check ${completed ? 'checked' : ''}`}
-                                disabled={busy || needsReview}
-                                aria-label={`${completed ? 'Reopen' : 'Mark complete'}: ${task.title}`}
-                                onClick={() =>
-                                  perform(
-                                    () =>
-                                      api(`/patients/${patientId}/tasks/${task.id}`, {
-                                        method: 'PATCH',
-                                        body: JSON.stringify({ complete: !completed }),
-                                      }),
-                                    completed
-                                      ? 'Task reopened.'
-                                      : 'Saved as patient-reported complete.',
-                                  )
-                                }
-                              >
-                                {completed && <Check size={14} />}
-                              </button>
-                              <div className={`task-icon ${task.category}`}>
-                                <Icon size={19} />
-                              </div>
-                              <div className="task-body">
-                                <div className="task-title-row">
-                                  <h3>{task.title}</h3>
-                                  {needsReview && <Badge tone="amber">Needs clarification</Badge>}
-                                  {completed && <Badge tone="green">Complete</Badge>}
+                              <div className="patient-cell">
+                                <span className={`avatar ${p.color}`}>{p.initials}</span>
+                                <div>
+                                  <strong>{p.name}</strong>
+                                  <small>
+                                    {p.clinician} · discharged {prettyDate(p.dischargedAt)}
+                                  </small>
                                 </div>
-                                <p>{task.detail}</p>
-                                <div className="task-meta">
-                                  <span className={overdue ? 'overdue' : ''}>
-                                    <Clock3 size={12} />
-                                    {task.due
-                                      ? `${overdue ? 'Overdue · ' : 'By '}${prettyDate(task.due)}`
-                                      : needsReview
-                                        ? 'No date specified'
-                                        : 'Before your visit'}
-                                  </span>
-                                  <span className="meta-dot">·</span>
-                                  <button className="source-link" onClick={() => showSource(task)}>
-                                    <Link2 size={12} /> View source
-                                  </button>
-                                </div>
-                                {saved && (
-                                  <a
-                                    className="saved-reminder"
-                                    href={`/api/patients/${patientId}/actions/${saved.id}/calendar`}
-                                  >
-                                    <CheckCircle2 size={13} /> Reminder ready <Download size={12} />
-                                  </a>
-                                )}
                               </div>
-                              {!needsReview && !completed && task.due && !saved && (
-                                <IconButton
-                                  label={`Set reminder for ${task.title}`}
-                                  onClick={() => remind(task)}
-                                  disabled={busy}
-                                >
-                                  <Bell size={17} />
-                                </IconButton>
-                              )}
-                            </article>
+                              <div className="table-progress">
+                                <span>
+                                  {count} / {p.tasks.length} complete
+                                </span>
+                                <div className="progress-track">
+                                  <i style={{ width: `${(count / p.tasks.length) * 100}%` }} />
+                                </div>
+                              </div>
+                              <div>
+                                <Badge tone={late ? 'red' : review ? 'amber' : 'green'}>
+                                  {help
+                                    ? 'Help requested'
+                                    : late
+                                      ? 'Overdue follow-up'
+                                      : review
+                                        ? 'Clarification needed'
+                                        : 'Plan in progress'}
+                                </Badge>
+                              </div>
+                              <ChevronRight size={18} />
+                            </button>
                           );
                         })}
                       </div>
                       <div className="plan-footer">
-                        <ShieldCheck size={15} />
-                        <span>
-                          Every step links to its source. Missing details go to your care team.
-                        </span>
+                        <CircleHelp size={15} />
+                        Completion is patient-reported. This demo does not connect to a hospital EHR
+                        or provide clinician authentication.
                       </div>
                     </section>
-                    <div className="right-column">
-                      <section className="card companion-card">
-                        <div className="companion-icon">
-                          <Sparkles size={23} />
-                        </div>
-                        <Badge>DISCHARGE ASSISTANT</Badge>
-                        <h2>Get clarity on your plan.</h2>
-                        <p>
-                          Find the answer in your discharge instructions, with the source right
-                          there.
-                        </p>
-                        <button className="question-chip" onClick={() => setAssistantOpen(true)}>
-                          “What should I do next?” <ArrowUpRight size={15} />
+                  </>
+                )}
+                {view === 'sources' && (
+                  <>
+                    <PageTitle
+                      eyebrow="THE SOURCE OF YOUR PLAN"
+                      title="Your instructions, together."
+                      subtitle="Searchable discharge documents with a direct path back to every instruction."
+                      action={
+                        <button className="button primary" onClick={() => setImportOpen(true)}>
+                          <Plus size={17} />
+                          Add record
                         </button>
+                      }
+                    />
+                    <div className="document-grid">
+                      {plan.documents.map((doc) => (
                         <button
-                          className="button primary full"
-                          onClick={() => setAssistantOpen(true)}
+                          className="card document-card"
+                          key={doc.id}
+                          onClick={() => setSource({ document: doc })}
                         >
-                          Ask Homeward <Sparkles size={16} />
-                        </button>
-                        <span className="assistant-mode">
-                          {status?.ready
-                            ? 'Connected to TrueForge'
-                            : 'Source search available · connect a model for AI'}
-                        </span>
-                      </section>
-                      <section className="card care-contact">
-                        <span className="eyebrow">YOUR FOLLOW-UP TEAM</span>
-                        <div className="doctor-row">
-                          <div className="doctor-avatar">
-                            <HeartPulse size={21} />
+                          <div className="document-top">
+                            <span className="document-icon">
+                              <FileText size={26} />
+                            </span>
+                            <Badge tone={doc.kind === 'synthetic' ? 'green' : 'amber'}>
+                              {doc.kind === 'synthea'
+                                ? 'Synthea · historical'
+                                : doc.kind === 'synthetic'
+                                  ? 'Synthetic fixture'
+                                  : 'Imported · unreviewed'}
+                            </Badge>
                           </div>
-                          <div>
-                            <h3>{plan.patient.clinician}</h3>
-                            <p>Discharge care team · fictional</p>
+                          <h2>{doc.title}</h2>
+                          <p>
+                            {doc.sections.length} source passages · {plan.patient.name}
+                          </p>
+                          <div className="document-bottom">
+                            Read source passages <ArrowUpRight size={17} />
                           </div>
-                        </div>
-                        <div className="contact-note">
-                          <CircleHelp size={16} />
-                          <span>
-                            Unclear instructions? Keep a question ready for your next conversation.
-                          </span>
-                        </div>
-                        <button className="text-button" onClick={() => setView('team')}>
-                          View care-team overview <ArrowRight size={15} />
                         </button>
-                      </section>
+                      ))}
                     </div>
-                  </div>
-                </>
-              )}
-              {view === 'team' && (
-                <>
-                  <PageTitle
-                    eyebrow="A SHARED PICTURE"
-                    title="No next step left unseen."
-                    subtitle="A demo care-team overview of follow-through, open questions, and approvals."
-                  />
-                  <div className="stat-grid">
-                    <Stat
-                      icon={Users}
-                      label="Demo patients"
-                      value={patients.length}
-                      detail="Synthetic records only"
-                    />
-                    <Stat
-                      icon={CircleHelp}
-                      label="Needs clarification"
-                      value={
-                        patients
-                          .flatMap((p) => p.tasks)
-                          .filter((t) => t.status === 'needs_clarification').length
-                      }
-                      detail="Instructions awaiting care-team review"
-                    />
-                    <Stat
-                      icon={Clock3}
-                      label="Overdue steps"
-                      value={
-                        patients
-                          .flatMap((p) => p.tasks)
-                          .filter((t) => t.due && t.due < plan.demoDate && t.status === 'pending')
-                          .length
-                      }
-                      detail="As of the demo date: September 19"
-                    />
-                  </div>
-                  <section className="card">
-                    <div className="section-heading">
-                      <h2>Patient follow-through</h2>
-                      <Badge>Synthetic cohort</Badge>
+                    <div className="info-strip">
+                      <ShieldCheck size={20} />
+                      <p>
+                        Imported documents become searchable immediately. New instructions are added
+                        for review with exact citations, without inferred deadlines.
+                      </p>
                     </div>
-                    <div className="patient-table">
-                      <div className="patient-table-header">
-                        <span>Patient</span>
-                        <span>Progress</span>
-                        <span>Attention</span>
-                        <span />
-                      </div>
-                      {patients.map((p) => {
-                        const count = p.tasks.filter((t) => t.status === 'completed').length;
-                        const late = p.tasks.some(
-                          (t) => t.due && t.due < plan.demoDate && t.status === 'pending',
-                        );
-                        const review = p.tasks.some((t) => t.status === 'needs_clarification');
-                        return (
-                          <button
-                            className="patient-row"
-                            key={p.id}
-                            onClick={() => {
-                              setPatientId(p.id);
-                              setView('plan');
-                            }}
-                          >
-                            <div className="patient-cell">
-                              <span className={`avatar ${p.color}`}>{p.initials}</span>
-                              <div>
-                                <strong>{p.name}</strong>
-                                <small>
-                                  {p.clinician} · discharged {prettyDate(p.dischargedAt)}
-                                </small>
-                              </div>
-                            </div>
-                            <div className="table-progress">
-                              <span>
-                                {count} / {p.tasks.length} complete
-                              </span>
-                              <div className="progress-track">
-                                <i style={{ width: `${(count / p.tasks.length) * 100}%` }} />
-                              </div>
-                            </div>
-                            <div>
-                              <Badge tone={late ? 'red' : review ? 'amber' : 'green'}>
-                                {late
-                                  ? 'Overdue follow-up'
-                                  : review
-                                    ? 'Clarification needed'
-                                    : 'Plan in progress'}
-                              </Badge>
-                            </div>
-                            <ChevronRight size={18} />
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="plan-footer">
-                      <CircleHelp size={15} />
-                      Completion is patient-reported. This demo does not connect to a hospital EHR
-                      or provide clinician authentication.
-                    </div>
-                  </section>
-                </>
-              )}
-              {view === 'sources' && (
-                <>
-                  <PageTitle
-                    eyebrow="THE SOURCE OF YOUR PLAN"
-                    title="Your instructions, together."
-                    subtitle="Searchable discharge documents with a direct path back to every instruction."
-                    action={
-                      <button className="button primary" onClick={() => setImportOpen(true)}>
-                        <Plus size={17} />
-                        Add record
-                      </button>
-                    }
-                  />
-                  <div className="document-grid">
-                    {plan.documents.map((doc) => (
-                      <button
-                        className="card document-card"
-                        key={doc.id}
-                        onClick={() => setSource({ document: doc })}
-                      >
-                        <div className="document-top">
-                          <span className="document-icon">
-                            <FileText size={26} />
-                          </span>
-                          <Badge tone={doc.kind === 'synthetic' ? 'green' : 'amber'}>
-                            {doc.kind === 'synthetic'
-                              ? 'Synthetic fixture'
-                              : 'Imported · unreviewed'}
-                          </Badge>
-                        </div>
-                        <h2>{doc.title}</h2>
-                        <p>
-                          {doc.sections.length} source passages · {plan.patient.name}
-                        </p>
-                        <div className="document-bottom">
-                          Read source passages <ArrowUpRight size={17} />
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="info-strip">
-                    <ShieldCheck size={20} />
-                    <p>
-                      Imported documents become searchable immediately. New instructions are added
-                      for review with exact citations, without inferred deadlines.
-                    </p>
-                  </div>
-                </>
-              )}
-              {view === 'resources' && <Resources onError={setError} />}
-              {view === 'harness' && <Harness status={status} onReset={() => setResetOpen(true)} />}
-              <footer className="page-footer">
-                <span>
-                  <House size={13} /> A clearer path home.
-                </span>
-                <span>
-                  Built with TrueForge <span className="footer-dot">·</span> Agent Harness Hackathon
-                  2026
-                </span>
-              </footer>
-            </>
-          )}
-        </main>
+                  </>
+                )}
+                {view === 'resources' && <Resources onError={setError} />}
+                {view === 'harness' && (
+                  <Harness status={status} onReset={() => setResetOpen(true)} />
+                )}
+                <footer className="page-footer">
+                  <span>
+                    <House size={13} /> A clearer path home.
+                  </span>
+                  <span>
+                    Built with TrueForge <span className="footer-dot">·</span> Agent Harness
+                    Hackathon 2026
+                  </span>
+                </footer>
+              </>
+            )}
+          </main>
+          <aside className="agent-dock" aria-label="Persistent discharge assistant">
+            {plan ? (
+              <div className="assistant-home">
+                <Assistant
+                  inputRef={assistantInputRef}
+                  key={patientId}
+                  patientId={patientId}
+                  patientName={plan.patient.name.split(' ')[0]}
+                  documents={plan.documents}
+                  actions={plan.actions}
+                  status={status}
+                  onImport={() => setImportOpen(true)}
+                  onPlan={() => setView('plan')}
+                  onReview={setAction}
+                  onDocument={(document) => setSource({ document })}
+                  onUpdate={refresh}
+                  onSource={(c) => {
+                    const document = plan.documents.find((d) => d.id === c.documentId);
+                    if (document) setSource({ document, sectionId: c.sectionId });
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="loading-state">
+                <LoaderCircle className="spin" size={18} />
+                Loading assistant…
+              </div>
+            )}
+          </aside>
+        </div>
       </div>
       {toast && (
         <div className="toast" role="status">
@@ -701,15 +804,31 @@ export default function App() {
         <Modal title={source.document.title} onClose={() => setSource(null)} wide>
           <div className="source-intro">
             <Badge tone={source.document.kind === 'synthetic' ? 'green' : 'amber'}>
-              {source.document.kind === 'synthetic'
-                ? 'Fictional discharge record'
-                : 'Imported text · requires review'}
+              {source.document.kind === 'synthea'
+                ? 'Synthea · historical context'
+                : source.document.kind === 'synthetic'
+                  ? 'Fictional discharge record'
+                  : 'Imported text · requires review'}
             </Badge>
             <p>
               Original passages for {plan.patient.name}. Highlighted text supports the selected
               task.
             </p>
           </div>
+          {source.document.provenance && (
+            <div className="provenance-panel">
+              <strong>Source provenance</strong>
+              <p>{source.document.provenance.notice}</p>
+              <a href={source.document.provenance.url} target="_blank" rel="noreferrer">
+                Official Synthea dataset
+              </a>
+              <p>Snapshot: {prettyDate(source.document.provenance.snapshotAt.slice(0, 10))}</p>
+              <details>
+                <summary>Archive SHA-256</summary>
+                <code>{source.document.provenance.archiveSha256}</code>
+              </details>
+            </div>
+          )}
           <div className="source-passages">
             {source.document.sections.map((s) => (
               <article
@@ -723,6 +842,14 @@ export default function App() {
                   </span>
                 </div>
                 <p>{s.text}</p>
+                {s.provenance && (
+                  <details className="provenance-panel">
+                    <summary>
+                      {s.provenance.file} · CSV row {s.provenance.row}
+                    </summary>
+                    <pre>{JSON.stringify(s.provenance, null, 2)}</pre>
+                  </details>
+                )}
                 {source.document.kind === 'imported' && (
                   <button
                     className="text-button"
@@ -754,8 +881,7 @@ export default function App() {
           onImported={async () => {
             await refresh();
             setImportOpen(false);
-            setToast('Record imported. Its passages are ready for source search.');
-            setView('sources');
+            setToast('Record imported. You can ask the assistant about it now.');
           }}
         />
       )}
@@ -765,19 +891,6 @@ export default function App() {
           patientId={patientId}
           onClose={() => setAction(null)}
           onChange={refresh}
-        />
-      )}
-      {assistantOpen && (
-        <Assistant
-          key={patientId}
-          patientId={patientId}
-          status={status}
-          onClose={() => setAssistantOpen(false)}
-          onUpdate={refresh}
-          onSource={(c) => {
-            const document = plan.documents.find((d) => d.id === c.documentId);
-            if (document) setSource({ document, sectionId: c.sectionId });
-          }}
         />
       )}
       {resetOpen && (
@@ -1040,13 +1153,30 @@ function ActionModal({ action: initial, patientId, onClose, onChange }) {
   );
 }
 
-function Assistant({ patientId, status, onClose, onUpdate, onSource }) {
+function Assistant({
+  inputRef,
+  patientId,
+  patientName,
+  documents,
+  actions,
+  status,
+  onImport,
+  onPlan,
+  onReview,
+  onDocument,
+  onUpdate,
+  onSource,
+}) {
   const [mode, setMode] = useState(status?.ready ? 'live' : 'source-search');
+  const [modeChosen, setModeChosen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const endRef = useRef(null);
+  useEffect(() => {
+    if (!modeChosen && !messages.length) setMode(status?.ready ? 'live' : 'source-search');
+  }, [status?.ready, modeChosen, messages.length]);
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [messages, busy]);
@@ -1067,57 +1197,97 @@ function Assistant({ patientId, status, onClose, onUpdate, onSource }) {
     }
   }
   return (
-    <aside className="assistant-panel" aria-label="Homeward discharge assistant">
+    <section
+      className="assistant-panel assistant-primary"
+      aria-label="Homeward discharge assistant"
+    >
       <div className="assistant-header">
         <div>
           <span className="mini-spark">
             <Sparkles size={19} />
           </span>
           <div>
-            <h2>Ask Homeward</h2>
-            <span>Your instructions, made clearer</span>
+            <h2>Your discharge assistant</h2>
+            <span>Clear answers. One step at a time.</span>
           </div>
         </div>
-        <IconButton label="Close assistant" onClick={onClose}>
-          <PanelRightClose size={21} />
-        </IconButton>
-      </div>
-      <div className="mode-switch">
-        <button
-          className={mode === 'source-search' ? 'selected' : ''}
-          onClick={() => setMode('source-search')}
-        >
-          Source search
-        </button>
-        <button className={mode === 'live' ? 'selected' : ''} onClick={() => setMode('live')}>
-          TrueForge agent {status?.ready && <span className="live-dot" />}
+        <button className="button secondary" onClick={onImport}>
+          <Plus size={16} /> Add record
         </button>
       </div>
-      <div className="mode-note">
-        {mode === 'live'
-          ? status?.ready
-            ? 'Live model · patient-scoped MCP tools · approval controls'
-            : 'Configure a model in TrueForge Settings → Models to enable live runs.'
-          : 'Exact document retrieval. No language model is used in this mode.'}
+      <div className="assistant-context">
+        <button className="record-context" onClick={() => onDocument(documents[0])}>
+          <FileText size={14} />
+          {documents.length === 1
+            ? 'Discharge record connected'
+            : `${documents.length} records connected`}
+          <ChevronRight size={13} />
+        </button>
+        <button className="text-button" onClick={onPlan}>
+          View care plan <ArrowUpRight size={14} />
+        </button>
       </div>
+      <details className="assistant-settings">
+        <summary>
+          <span
+            className={`connection-dot ${mode === 'live' && status?.ready ? 'connected' : ''}`}
+          />
+          {mode === 'live' && status?.ready ? 'AI assistant connected' : 'Document search mode'}
+          <ChevronRight size={12} />
+        </summary>
+        <div className="mode-switch">
+          <button
+            className={mode === 'source-search' ? 'selected' : ''}
+            onClick={() => {
+              setModeChosen(true);
+              setMode('source-search');
+            }}
+          >
+            Source search
+          </button>
+          <button
+            className={mode === 'live' ? 'selected' : ''}
+            onClick={() => {
+              setModeChosen(true);
+              setMode('live');
+            }}
+          >
+            TrueForge agent {status?.ready && <span className="live-dot" />}
+          </button>
+        </div>
+        <div className="mode-note">
+          {mode === 'live'
+            ? status?.ready
+              ? 'Live model · patient-scoped MCP tools · approval controls'
+              : 'Configure a model in TrueForge Settings → Models to enable live runs.'
+            : 'Exact document retrieval. No language model is used in this mode.'}
+        </div>
+      </details>
       <div className="chat-messages">
         {messages.length === 0 && (
           <div className="chat-welcome">
             <div className="companion-icon">
               <Sparkles size={26} />
             </div>
-            <h3>Let’s find your next step.</h3>
-            <p>Ask about your follow-up, paperwork, or an instruction you want to clarify.</p>
-            {[
-              'What follow-up do I need?',
-              'What paperwork should I bring?',
-              'What does the laboratory instruction say?',
-            ].map((q) => (
-              <button className="question-chip" key={q} onClick={() => send(q)}>
-                {q}
-                <ArrowUpRight size={14} />
-              </button>
-            ))}
+            <span className="eyebrow">YOUR DISCHARGE, SIMPLIFIED</span>
+            <h1>Hi {patientName}. What can we clear up?</h1>
+            <p>
+              You don’t have to work through everything at once.
+              <br />
+              Ask a question, and we’ll start with your discharge instructions.
+            </p>
+            <div className="suggested-questions">
+              {[
+                'What follow-up do I need?',
+                'What paperwork should I bring?',
+                'What does the laboratory instruction say?',
+              ].map((q) => (
+                <button className="question-chip" key={q} onClick={() => send(q)}>
+                  {q}
+                  <ArrowUpRight size={14} />
+                </button>
+              ))}
+            </div>
           </div>
         )}
         {messages.map((m, i) => (
@@ -1157,6 +1327,25 @@ function Assistant({ patientId, status, onClose, onUpdate, onSource }) {
         )}
         <div ref={endRef} />
       </div>
+      {actions
+        .filter((a) => a.status === 'proposed' || a.status === 'approved')
+        .slice(0, 1)
+        .map((a) => (
+          <div className="assistant-approval" key={a.id}>
+            <ShieldCheck size={18} />
+            <div>
+              <strong>
+                {a.status === 'proposed'
+                  ? 'A reminder is ready for your review'
+                  : 'Your approved reminder is ready to create'}
+              </strong>
+              <span>{a.title}</span>
+            </div>
+            <button className="button secondary" onClick={() => onReview(a)}>
+              Review
+            </button>
+          </div>
+        ))}
       <form
         className="chat-composer"
         onSubmit={(e) => {
@@ -1168,8 +1357,9 @@ function Assistant({ patientId, status, onClose, onUpdate, onSource }) {
           Ask about your discharge
         </label>
         <textarea
+          ref={inputRef}
           id="chat-input"
-          placeholder="Ask about your discharge…"
+          placeholder="What would you like help with?"
           value={input}
           maxLength={2500}
           rows={2}
@@ -1185,11 +1375,15 @@ function Assistant({ patientId, status, onClose, onUpdate, onSource }) {
           <Send size={18} />
         </button>
       </form>
+      <div className="assistant-reassurance">
+        <ShieldCheck size={13} />
+        Based on your records. Actions always need your approval.
+      </div>
       <p className="chat-footnote">
         Each question starts a fresh run. For changes to your care or new symptoms, contact your
         care team.
       </p>
-    </aside>
+    </section>
   );
 }
 

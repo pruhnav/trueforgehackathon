@@ -16,7 +16,7 @@ npm run build
 npm start
 ```
 
-Open **http://localhost:8000**. Three fictional patients are included. No credentials are needed for the source-search and local workflow demo.
+Open **http://localhost:8000**. Three hand-authored fictional patients and one official Synthea sample patient are included. No credentials are needed for the source-search and local workflow demo.
 
 For development, use `npm run dev`: the React UI runs on **http://localhost:5173** and proxies API calls to port 8000. Stop `npm start` before starting development mode, since both use port 8000.
 
@@ -24,7 +24,7 @@ For development, use `npm run dev`: the React UI runs on **http://localhost:5173
 
 1. Start TrueForge in a separate terminal: `npx @truefoundry/trueforge@latest`.
 2. Open **http://localhost:8790 → Settings → Models**. Configure the event-provided model access. If the event provides a compatible AI Gateway, use its base URL, key, and exact model ID in a custom provider. Credentials stay in TrueForge, not this repository or the browser.
-3. Keep Homeward running and execute **`npm run setup:trueforge`**. This registers three patient-scoped MCP connectors and, when a model is configured, saves an example Homeward agent. Existing connectors are preserved; a conflicting URL requires manual review.
+3. Keep Homeward running and execute **`npm run setup:trueforge`**. This registers patient-scoped MCP connectors for all seeded patients and, when a model is configured, saves an example Homeward agent. Existing connectors are preserved; a conflicting URL requires manual review.
 4. Open **Ask Homeward → TrueForge agent**. The app starts a real TrueForge session with a patient-bound MCP connector and displays the returned answer. Each question starts a fresh session.
 
 Manual connector setup for Alex:
@@ -49,7 +49,7 @@ The app uses TrueForge's HTTP API and MCP execution. Gateway routing, provider f
 - **Retrieval:** deterministic lexical passage search locally; a connected TrueForge agent can retrieve passages and answer with their context. No vector database or embedding service is required for this small corpus.
 - **Approval-controlled reminders:** propose, approve or decline, execute, and download a real `.ics` calendar file. Local reminder creation is not an appointment booking, email, SMS, or scheduled notification service.
 - **Failure demo:** simulate response loss after a reminder is stored; retry the same action and receive the original receipt without creating a duplicate.
-- **Care-team overview:** three synthetic patients with pending, completed, overdue, and clarification states. It is a demo view, not a role-authenticated clinician portal.
+- **Care-team overview:** synthetic patients with pending, completed, overdue, help-requested, and clarification states. It is a demo view, not a role-authenticated clinician portal.
 - **Online education:** live MedlinePlus Web Service lookup using only fixed general topic searches, with attributed curated links when unavailable. Results are cached for 12 hours. Education never changes the patient's care plan.
 - **Agent activity:** actual application/MCP traces, approval decisions, latency, TrueForge session IDs, and reported token/cost metrics. Missing cost data is labeled as unavailable.
 - **Evaluation evidence:** isolated deterministic guardrail checks, an actual MCP protocol test, and a DOM interaction test covering the main journey.
@@ -116,3 +116,13 @@ GitHub Actions runs the tests, evaluation, and production build on pushes and pu
 - [MedlinePlus Web Service](https://medlineplus.gov/about/developers/webservices/)
 
 MedlinePlus.gov provides the linked educational information and does not endorse Homeward.
+
+## Synthea sample and help requests
+
+Open **Care team → Hui Stoltenberg** to explore the bundled Synthea patient. Open **My documents → Synthea historical record** for the official source URL, archive hash, and per-passage CSV file, row, fields, and file hash. The snapshot is selected from the latest completed inpatient encounter in the official sample archive. Records are filtered as of that discharge date, conservatively excluding records stopped on that day. These are historical synthetic records, not verified discharge orders; no medication schedules or deadlines are inferred.
+
+Regenerate the bundled sample with Python 3 (network access required): `python scripts/ingest-synthea.py`. The upstream latest archive can change; review the resulting patient and provenance diff before accepting it. The bundled JSON works offline. Existing local patients are not overwritten at startup; use the app's explicit demo reset to reload a changed snapshot.
+
+**Need help** flags an open task in the local care-team view. It persists in SQLite and pauses completion, reminder proposals, and execution of previously approved reminders. Clearing help preserves the original clarification status. It does not notify a clinician or send any external message. Already-created calendar files are not recalled.
+
+Data sources remain distinct: hand-authored demo instructions, imported user documents, the [official Synthea sample dataset](https://github.com/synthetichealth/synthea-sample-data), and general MedlinePlus education. The Synthea ingestion is implemented independently; no code from Harbor was copied.

@@ -1,5 +1,8 @@
 import { ensureConnector, forgeStatus, forgeRequest, agentSpec } from '../server/trueforge.js';
-import { patients } from '../server/fixtures.js';
+import { Store } from '../server/store.js';
+const store = new Store();
+const patients = store.all('patient');
+store.close();
 const status = await forgeStatus();
 if (!status.connected) {
   console.error('Start TrueForge at http://localhost:8790, then retry.');

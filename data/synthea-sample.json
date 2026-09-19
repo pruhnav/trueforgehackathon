@@ -1,0 +1,281 @@
+{
+  "patient": {
+    "id": "synthea-d537941e-1fb7-9868-939a-a26252da8be1",
+    "name": "Hui Stoltenberg",
+    "initials": "HS",
+    "age": 35,
+    "condition": "Synthea historical sample",
+    "dischargedAt": "2026-05-15",
+    "clinician": "Not provided in discharge record",
+    "hospital": "Synthea synthetic dataset",
+    "color": "lavender",
+    "provenance": {
+      "file": "patients.csv",
+      "row": 102,
+      "fileSha256": "0e8a61760644976571e7ede02e8be5bfece5111bc179d2139af87f84b630c859"
+    }
+  },
+  "document": {
+    "id": "doc-synthea-d537941e-1fb7-9868-939a-a26252da8be1",
+    "patientId": "synthea-d537941e-1fb7-9868-939a-a26252da8be1",
+    "title": "Synthea historical record",
+    "kind": "synthea",
+    "importedAt": "2026-09-19T20:20:31.214167+00:00",
+    "provenance": {
+      "source": "Synthea public sample dataset",
+      "url": "https://raw.githubusercontent.com/synthetichealth/synthea-sample-data/main/downloads/latest/synthea_sample_data_csv_latest.zip",
+      "archiveSha256": "d61417b551e5b0997c33851b339c157421751f0ea68c18ea686ceb1850907c35",
+      "snapshotAt": "2026-05-15T18:27:12Z",
+      "notice": "Synthetic historical data. No discharge regimen or deadlines inferred."
+    },
+    "sections": [
+      {
+        "id": "s1",
+        "heading": "Historical hospital encounter",
+        "text": "Synthetic inpatient encounter: 2026-05-14T18:27:12Z to 2026-05-15T18:27:12Z. Admission to surgical department (procedure). This is a historical dataset snapshot, not discharge instructions.",
+        "page": null,
+        "provenance": {
+          "file": "encounters.csv",
+          "row": 4767,
+          "fileSha256": "16d209cb1429605c90c80cd859ac16569108dc46890f50eb6a125a0602235b3a",
+          "sourcePatientId": "d537941e-1fb7-9868-939a-a26252da8be1",
+          "sourceRecordId": "d537941e-1fb7-9868-527b-353b7e18f586",
+          "fields": {
+            "Id": "d537941e-1fb7-9868-527b-353b7e18f586",
+            "START": "2026-05-14T18:27:12Z",
+            "STOP": "2026-05-15T18:27:12Z",
+            "PATIENT": "d537941e-1fb7-9868-939a-a26252da8be1",
+            "ORGANIZATION": "5b0cd0a0-f277-3a66-bee6-d64b5be4a3f5",
+            "PROVIDER": "a2048952-600d-3b1d-8c27-dad642e93cba",
+            "PAYER": "df166300-5a78-3502-a46a-832842197811",
+            "ENCOUNTERCLASS": "inpatient",
+            "CODE": "305408004",
+            "DESCRIPTION": "Admission to surgical department (procedure)",
+            "BASE_ENCOUNTER_COST": "146.18",
+            "TOTAL_CLAIM_COST": "13537.81",
+            "PAYER_COVERAGE": "13487.81",
+            "REASONCODE": "183996000",
+            "REASONDESCRIPTION": "Sterilization requested (situation)"
+          }
+        }
+      },
+      {
+        "id": "s2",
+        "heading": "Condition history",
+        "text": "Source-recorded: Received higher education (finding). Start: 2008-09-14. Stop: not recorded. Historical context only; discharge dose, timing, and follow-up directions are unverified.",
+        "page": null,
+        "provenance": {
+          "file": "conditions.csv",
+          "row": 2954,
+          "fileSha256": "a3141544140b626c9ae941043ad1afe4a0c201749b2e332c98f4cb2e2b7ec4cd",
+          "sourcePatientId": "d537941e-1fb7-9868-939a-a26252da8be1",
+          "sourceRecordId": null,
+          "fields": {
+            "START": "2008-09-14",
+            "STOP": "",
+            "PATIENT": "d537941e-1fb7-9868-939a-a26252da8be1",
+            "ENCOUNTER": "d537941e-1fb7-9868-7897-4026c5a683c2",
+            "SYSTEM": "http://snomed.info/sct",
+            "CODE": "224299000",
+            "DESCRIPTION": "Received higher education (finding)"
+          }
+        }
+      },
+      {
+        "id": "s3",
+        "heading": "Condition history",
+        "text": "Source-recorded: Transport problem (finding). Start: 2008-09-14. Stop: not recorded. Historical context only; discharge dose, timing, and follow-up directions are unverified.",
+        "page": null,
+        "provenance": {
+          "file": "conditions.csv",
+          "row": 2955,
+          "fileSha256": "a3141544140b626c9ae941043ad1afe4a0c201749b2e332c98f4cb2e2b7ec4cd",
+          "sourcePatientId": "d537941e-1fb7-9868-939a-a26252da8be1",
+          "sourceRecordId": null,
+          "fields": {
+            "START": "2008-09-14",
+            "STOP": "",
+            "PATIENT": "d537941e-1fb7-9868-939a-a26252da8be1",
+            "ENCOUNTER": "d537941e-1fb7-9868-7897-4026c5a683c2",
+            "SYSTEM": "http://snomed.info/sct",
+            "CODE": "266934004",
+            "DESCRIPTION": "Transport problem (finding)"
+          }
+        }
+      },
+      {
+        "id": "s4",
+        "heading": "Condition history",
+        "text": "Source-recorded: Lack of access to transportation (finding). Start: 2009-09-20. Stop: not recorded. Historical context only; discharge dose, timing, and follow-up directions are unverified.",
+        "page": null,
+        "provenance": {
+          "file": "conditions.csv",
+          "row": 2956,
+          "fileSha256": "a3141544140b626c9ae941043ad1afe4a0c201749b2e332c98f4cb2e2b7ec4cd",
+          "sourcePatientId": "d537941e-1fb7-9868-939a-a26252da8be1",
+          "sourceRecordId": null,
+          "fields": {
+            "START": "2009-09-20",
+            "STOP": "",
+            "PATIENT": "d537941e-1fb7-9868-939a-a26252da8be1",
+            "ENCOUNTER": "d537941e-1fb7-9868-1239-45d05e635300",
+            "SYSTEM": "http://snomed.info/sct",
+            "CODE": "713458007",
+            "DESCRIPTION": "Lack of access to transportation (finding)"
+          }
+        }
+      },
+      {
+        "id": "s5",
+        "heading": "Condition history",
+        "text": "Source-recorded: Body mass index 30+ - obesity (finding). Start: 2012-09-23. Stop: not recorded. Historical context only; discharge dose, timing, and follow-up directions are unverified.",
+        "page": null,
+        "provenance": {
+          "file": "conditions.csv",
+          "row": 2958,
+          "fileSha256": "a3141544140b626c9ae941043ad1afe4a0c201749b2e332c98f4cb2e2b7ec4cd",
+          "sourcePatientId": "d537941e-1fb7-9868-939a-a26252da8be1",
+          "sourceRecordId": null,
+          "fields": {
+            "START": "2012-09-23",
+            "STOP": "",
+            "PATIENT": "d537941e-1fb7-9868-939a-a26252da8be1",
+            "ENCOUNTER": "d537941e-1fb7-9868-8717-7fea5ee200fb",
+            "SYSTEM": "http://snomed.info/sct",
+            "CODE": "162864005",
+            "DESCRIPTION": "Body mass index 30+ - obesity (finding)"
+          }
+        }
+      },
+      {
+        "id": "s6",
+        "heading": "Condition history",
+        "text": "Source-recorded: Past pregnancy history of miscarriage (situation). Start: 2017-12-27. Stop: not recorded. Historical context only; discharge dose, timing, and follow-up directions are unverified.",
+        "page": null,
+        "provenance": {
+          "file": "conditions.csv",
+          "row": 2964,
+          "fileSha256": "a3141544140b626c9ae941043ad1afe4a0c201749b2e332c98f4cb2e2b7ec4cd",
+          "sourcePatientId": "d537941e-1fb7-9868-939a-a26252da8be1",
+          "sourceRecordId": null,
+          "fields": {
+            "START": "2017-12-27",
+            "STOP": "",
+            "PATIENT": "d537941e-1fb7-9868-939a-a26252da8be1",
+            "ENCOUNTER": "d537941e-1fb7-9868-2f01-235276053855",
+            "SYSTEM": "http://snomed.info/sct",
+            "CODE": "161744009",
+            "DESCRIPTION": "Past pregnancy history of miscarriage (situation)"
+          }
+        }
+      },
+      {
+        "id": "s7",
+        "heading": "Condition history",
+        "text": "Source-recorded: Medication review due (situation). Start: 2024-08-11. Stop: not recorded. Historical context only; discharge dose, timing, and follow-up directions are unverified.",
+        "page": null,
+        "provenance": {
+          "file": "conditions.csv",
+          "row": 2974,
+          "fileSha256": "a3141544140b626c9ae941043ad1afe4a0c201749b2e332c98f4cb2e2b7ec4cd",
+          "sourcePatientId": "d537941e-1fb7-9868-939a-a26252da8be1",
+          "sourceRecordId": null,
+          "fields": {
+            "START": "2024-08-11",
+            "STOP": "",
+            "PATIENT": "d537941e-1fb7-9868-939a-a26252da8be1",
+            "ENCOUNTER": "d537941e-1fb7-9868-ee44-da8bc88b4fd6",
+            "SYSTEM": "http://snomed.info/sct",
+            "CODE": "314529007",
+            "DESCRIPTION": "Medication review due (situation)"
+          }
+        }
+      },
+      {
+        "id": "s8",
+        "heading": "Condition history",
+        "text": "Source-recorded: Full-time employment (finding). Start: 2024-10-06. Stop: not recorded. Historical context only; discharge dose, timing, and follow-up directions are unverified.",
+        "page": null,
+        "provenance": {
+          "file": "conditions.csv",
+          "row": 2976,
+          "fileSha256": "a3141544140b626c9ae941043ad1afe4a0c201749b2e332c98f4cb2e2b7ec4cd",
+          "sourcePatientId": "d537941e-1fb7-9868-939a-a26252da8be1",
+          "sourceRecordId": null,
+          "fields": {
+            "START": "2024-10-06",
+            "STOP": "",
+            "PATIENT": "d537941e-1fb7-9868-939a-a26252da8be1",
+            "ENCOUNTER": "d537941e-1fb7-9868-c4f7-2853153b754e",
+            "SYSTEM": "http://snomed.info/sct",
+            "CODE": "160903007",
+            "DESCRIPTION": "Full-time employment (finding)"
+          }
+        }
+      },
+      {
+        "id": "s9",
+        "heading": "Condition history",
+        "text": "Source-recorded: History of tubal ligation (situation). Start: 2026-05-14. Stop: not recorded. Historical context only; discharge dose, timing, and follow-up directions are unverified.",
+        "page": null,
+        "provenance": {
+          "file": "conditions.csv",
+          "row": 2979,
+          "fileSha256": "a3141544140b626c9ae941043ad1afe4a0c201749b2e332c98f4cb2e2b7ec4cd",
+          "sourcePatientId": "d537941e-1fb7-9868-939a-a26252da8be1",
+          "sourceRecordId": null,
+          "fields": {
+            "START": "2026-05-14",
+            "STOP": "",
+            "PATIENT": "d537941e-1fb7-9868-939a-a26252da8be1",
+            "ENCOUNTER": "d537941e-1fb7-9868-527b-353b7e18f586",
+            "SYSTEM": "http://snomed.info/sct",
+            "CODE": "267020005",
+            "DESCRIPTION": "History of tubal ligation (situation)"
+          }
+        }
+      },
+      {
+        "id": "s10",
+        "heading": "Care-plan history",
+        "text": "Source-recorded: Minor surgery care management (procedure). Start: 2026-05-14. Stop: 2026-06-01. Historical context only; discharge dose, timing, and follow-up directions are unverified.",
+        "page": null,
+        "provenance": {
+          "file": "careplans.csv",
+          "row": 323,
+          "fileSha256": "bce3029163eb85442255fa4361be456191308a18173b91a139050979119f43ae",
+          "sourcePatientId": "d537941e-1fb7-9868-939a-a26252da8be1",
+          "sourceRecordId": "d537941e-1fb7-9868-8bc7-d6024fd9a3ee",
+          "fields": {
+            "Id": "d537941e-1fb7-9868-8bc7-d6024fd9a3ee",
+            "START": "2026-05-14",
+            "STOP": "2026-06-01",
+            "PATIENT": "d537941e-1fb7-9868-939a-a26252da8be1",
+            "ENCOUNTER": "d537941e-1fb7-9868-527b-353b7e18f586",
+            "CODE": "737471002",
+            "DESCRIPTION": "Minor surgery care management (procedure)",
+            "REASONCODE": "",
+            "REASONDESCRIPTION": ""
+          }
+        }
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": "synthea-d537941e-1fb7-9868-939a-a26252da8be1-review",
+      "patientId": "synthea-d537941e-1fb7-9868-939a-a26252da8be1",
+      "title": "Verify discharge instructions with the care team",
+      "detail": "This historical sample has no verified discharge regimen. Review the original instructions before creating dated tasks.",
+      "category": "clarification",
+      "due": null,
+      "status": "needs_clarification",
+      "completedAt": null,
+      "source": {
+        "documentId": "doc-synthea-d537941e-1fb7-9868-939a-a26252da8be1",
+        "sectionId": "s1",
+        "quote": "Synthetic inpatient encounter: 2026-05-14T18:27:12Z to 2026-05-15T18:27:12Z. Admission to surgical department (procedure). This is a historical dataset snapshot, not discharge instructions."
+      }
+    }
+  ]
+}

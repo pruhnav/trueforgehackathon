@@ -46,7 +46,42 @@ test('Patient UI: sources, completion, safe reminder retry, retrieval, care team
   const user = userEvent.setup({ document: dom.window.document });
   try {
     render(<App />);
+    await screen.findByRole('heading', { name: 'Hi Alex. What can we clear up?' });
+    assert.ok(screen.getByRole('heading', { name: 'Your recovery, organized.' }));
+    assert.ok(screen.getByRole('complementary', { name: 'Persistent discharge assistant' }));
+    await user.click(screen.getByRole('button', { name: 'Collapse menu' }));
+    assert.equal(
+      screen.getByRole('button', { name: 'Expand menu' }).getAttribute('aria-expanded'),
+      'false',
+    );
+    assert.equal(dom.window.localStorage.getItem('homeward.menuCollapsed'), 'true');
+    await user.click(screen.getByRole('button', { name: 'Expand menu' }));
+    assert.equal(
+      screen.getByRole('button', { name: 'Collapse menu' }).getAttribute('aria-expanded'),
+      'true',
+    );
+    await user.click(screen.getByRole('button', { name: 'What follow-up do I need?' }));
+    await screen.findByText(/These are exact source excerpts/);
+    await user.click(screen.getByRole('button', { name: 'View care plan' }));
     await screen.findByRole('heading', { name: 'Your recovery, organized.' });
+    await user.click(screen.getAllByRole('button', { name: 'Need help', exact: true })[0]);
+    await screen.findByText('Help requested', { selector: '.badge' });
+    assert.equal(
+      screen.getByRole('button', { name: 'Mark complete: Arrange your follow-up visit' }).disabled,
+      true,
+    );
+    assert.equal(
+      screen.queryByRole('button', { name: 'Set reminder for Arrange your follow-up visit' }),
+      null,
+    );
+    await user.click(screen.getByRole('button', { name: 'Clear help request' }));
+    await waitFor(() =>
+      assert.equal(
+        screen.getByRole('button', { name: 'Mark complete: Arrange your follow-up visit' })
+          .disabled,
+        false,
+      ),
+    );
     await user.click(screen.getAllByRole('button', { name: 'View source' })[0]);
     assert.ok(screen.getByRole('dialog', { name: 'Discharge summary' }));
     assert.match(screen.getByRole('dialog').textContent, /within seven days/);
@@ -69,20 +104,33 @@ test('Patient UI: sources, completion, safe reminder retry, retrieval, care team
     assert.match(calendar.getAttribute('href'), /\/calendar$/);
     assert.equal(store.all('action').length, 1);
     await user.click(screen.getByRole('button', { name: 'Close dialog' }));
-    await user.click(screen.getByRole('button', { name: 'Ask Homeward' }));
-    await user.click(screen.getByRole('button', { name: 'What paperwork should I bring?' }));
-    await screen.findByText(/These are exact source excerpts/);
-    await user.click(screen.getByRole('button', { name: 'Close assistant' }));
+    await user.click(screen.getByRole('button', { name: 'Focus discharge assistant' }));
+    assert.equal(document.activeElement, screen.getByLabelText('Ask about your discharge'));
+    assert.ok(screen.getByText(/These are exact source excerpts/));
+    await user.type(
+      screen.getByLabelText('Ask about your discharge'),
+      'What paperwork should I bring?',
+    );
+    await user.click(screen.getByRole('button', { name: 'Send question' }));
+    await waitFor(() =>
+      assert.equal(screen.getAllByText(/These are exact source excerpts/).length, 2),
+    );
     await user.click(screen.getByRole('button', { name: 'Care team', exact: true }));
     await screen.findByText('Overdue follow-up');
+    assert.equal(screen.getAllByText(/These are exact source excerpts/).length, 2);
     await user.click(screen.getByRole('button', { name: /Jordan Rivera/ }));
     await screen.findByText(/Jordan, here’s your plan/);
+    await screen.findByRole('heading', { name: 'Hi Jordan. What can we clear up?' });
+    assert.equal(screen.queryByText(/These are exact source excerpts/), null);
+    await user.click(screen.getByRole('button', { name: 'View care plan' }));
     await user.click(screen.getByRole('button', { name: 'Add discharge record' }));
     await user.type(
       screen.getByLabelText('Discharge instructions'),
       'Contact the clinic to clarify the next appointment date.',
     );
     await user.click(screen.getByRole('button', { name: 'Import record' }));
+    await screen.findByRole('button', { name: /2 records connected/ });
+    await user.click(screen.getByRole('button', { name: 'My documents', exact: true }));
     await screen.findByRole('heading', { name: 'Your instructions, together.' });
     await user.click(screen.getByRole('button', { name: /Additional discharge instructions/ }));
     await user.click(screen.getByRole('button', { name: 'Add for care-team review' }));
@@ -95,6 +143,14 @@ test('Patient UI: sources, completion, safe reminder retry, retrieval, care team
     await user.click(screen.getByRole('button', { name: 'Agent activity' }));
     await screen.findByRole('heading', { name: 'Trust is in the details.' });
     await screen.findByText('reminder.deduplicated');
+    await user.click(screen.getByRole('button', { name: 'Care team', exact: true }));
+    await user.click(await screen.findByRole('button', { name: /Hui Stoltenberg/ }));
+    await screen.findByRole('heading', { name: 'Hi Hui. What can we clear up?' });
+    await user.click(screen.getByRole('button', { name: 'My documents', exact: true }));
+    await user.click(await screen.findByRole('button', { name: /Synthea historical record/ }));
+    assert.ok(screen.getByRole('link', { name: 'Official Synthea dataset' }));
+    assert.ok(screen.getByText('Source provenance'));
+    assert.ok(screen.getByText(/encounters.csv · CSV row/));
   } finally {
     cleanup();
     globalThis.fetch = originalFetch;

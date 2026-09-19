@@ -45,6 +45,10 @@ export function createApp(store) {
     const { complete } = z.object({ complete: z.boolean() }).parse(req.body);
     res.json(store.completeTask(req.params.id, req.params.taskId, complete));
   });
+  app.post('/api/patients/:id/tasks/:taskId/help', (req, res) => {
+    const { requested } = z.object({ requested: z.boolean() }).parse(req.body);
+    res.json(store.requestHelp(req.params.id, req.params.taskId, requested));
+  });
   app.post('/api/patients/:id/documents', async (req, res) => {
     const input = z
       .object({
@@ -184,16 +188,14 @@ export function createApp(store) {
   app.use((_req, res) => res.status(404).json({ error: 'Endpoint not found.' }));
   app.use((error, _req, res, _next) => {
     const status = error instanceof z.ZodError ? 400 : error.status || 500;
-    res
-      .status(status)
-      .json({
-        error:
-          error instanceof z.ZodError
-            ? 'Invalid request. Check the input fields.'
-            : status === 500
-              ? 'Something went wrong. Check the local server logs.'
-              : error.message,
-      });
+    res.status(status).json({
+      error:
+        error instanceof z.ZodError
+          ? 'Invalid request. Check the input fields.'
+          : status === 500
+            ? 'Something went wrong. Check the local server logs.'
+            : error.message,
+    });
     if (status === 500) console.error(error);
   });
   return app;

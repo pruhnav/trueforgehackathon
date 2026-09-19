@@ -1,5 +1,5 @@
 import { DatabaseSync } from 'node:sqlite';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { fixtures, DEMO_DATE } from './fixtures.js';
@@ -18,6 +18,7 @@ export class Store {
       'PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS records (kind TEXT NOT NULL, id TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(kind,id));',
     );
     if (!this.all('patient').length) this.seed();
+    this.seedSynthea();
   }
   all(kind) {
     return this.db
@@ -43,6 +44,28 @@ export class Store {
       this.put('document', document);
       for (const task of tasks) this.put('task', task);
     }
+  }
+  seedSynthea() {
+    const { patient, document, tasks } = JSON.parse(
+      readFileSync(new URL('../data/synthea-sample.json', import.meta.url), 'utf8'),
+    );
+    if (this.get('patient', patient.id)) return;
+    this.put('patient', patient);
+    this.put('document', document);
+    for (const task of tasks) this.put('task', task);
+  }
+  requestHelp(patientId, taskId, requested) {
+    const task = this.scoped('task', taskId, patientId);
+    if (task.status === 'completed') throw new AppError('Reopen this task before requesting help.');
+    task.helpRequestedAt = requested ? task.helpRequestedAt || new Date().toISOString() : null;
+    this.put('task', task);
+    this.trace(
+      'task.help',
+      `${task.title}: ${requested ? 'help requested in local care-team view' : 'help request cleared'}`,
+      'ok',
+      { patientId },
+    );
+    return task;
   }
   trace(event, detail, status = 'ok', extra = {}) {
     return this.put('trace', {
@@ -99,6 +122,8 @@ export class Store {
         d.sections.map((s) => ({
           documentId: d.id,
           documentTitle: d.title,
+          kind: d.kind,
+          provenance: s.provenance || null,
           sectionId: s.id,
           heading: s.heading,
           page: s.page,
@@ -115,6 +140,8 @@ export class Store {
   }
   completeTask(patientId, taskId, complete) {
     const task = this.scoped('task', taskId, patientId);
+    if (task.helpRequestedAt)
+      throw new AppError('Clear the help request before completing this task.');
     if (task.status === 'needs_clarification')
       throw new AppError('This item needs care-team clarification before it can be completed.');
     task.status = complete ? 'completed' : 'pending';
@@ -192,7 +219,7 @@ export class Store {
   }
   proposeReminder(patientId, taskId) {
     const task = this.scoped('task', taskId, patientId);
-    if (task.status !== 'pending' || !task.due)
+    if (task.helpRequestedAt || task.status !== 'pending' || !task.due)
       throw new AppError('Only an open task with an explicit deadline can have a reminder.');
     const existing = this.all('action').find(
       (a) => a.patientId === patientId && a.taskId === taskId && a.status !== 'rejected',
@@ -251,7 +278,7 @@ export class Store {
       throw new AppError('Human approval is required before execution.', 403);
     }
     const task = this.scoped('task', action.taskId, patientId);
-    if (task.status !== 'pending' || task.due !== action.due)
+    if (task.helpRequestedAt || task.status !== 'pending' || task.due !== action.due)
       throw new AppError(
         'Task changed after proposal. Recheck the care plan before creating a reminder.',
         409,
@@ -283,6 +310,7 @@ export class Store {
   reset() {
     this.db.exec('DELETE FROM records');
     this.seed();
+    this.seedSynthea();
     this.trace('demo.reset', 'Synthetic scenarios restored.');
   }
   close() {
