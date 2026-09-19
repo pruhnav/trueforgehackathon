@@ -4,6 +4,8 @@ import { dirname } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { fixtures, DEMO_DATE } from './fixtures.js';
+import { buildGuidance } from './guidance.js';
+import { buildDischargeSummary, clinicalSnapshotVersion } from './summary.js';
 
 const referenceSchema = z
   .object({
@@ -383,7 +385,7 @@ export class Store {
     return value;
   }
   plan(patientId) {
-    return {
+    const plan = {
       patient: this.patient(patientId),
       tasks: this.all('task').filter((t) => t.patientId === patientId),
       documents: this.all('document').filter((d) => d.patientId === patientId),
@@ -397,6 +399,22 @@ export class Store {
         })),
       demoDate: DEMO_DATE,
     };
+    plan.guidance = buildGuidance(plan, (task) => {
+      this.sourceReference(patientId, task.source);
+      this.sourceReference(patientId, task.instruction ?? task.source, true);
+      if (task.due != null && !isCalendarDate(task.due))
+        throw new AppError('Recorded deadline requires review.', 422, 'INVALID_DATE');
+      if (task.dateEvidence && task.dateEvidence.kind !== 'legacy') {
+        const evidence = dateEvidenceSchema.safeParse(task.dateEvidence);
+        if (!evidence.success)
+          throw new AppError('Deadline evidence requires review.', 422, 'DATE_EVIDENCE_REQUIRED');
+        this.reviewDate(patientId, task.due ?? null, evidence.data);
+      } else if (task.due == null && task.dateEvidence) {
+        throw new AppError('Deadline evidence requires review.', 422, 'DATE_EVIDENCE_REQUIRED');
+      }
+    });
+    plan.snapshotVersion = clinicalSnapshotVersion(plan);
+    return plan;
   }
   search(patientId, query) {
     const plan = this.plan(patientId);
@@ -437,6 +455,9 @@ export class Store {
       .filter((s) => s.score > 0)
       .sort((a, b) => b.score - a.score)
       .slice(0, 4);
+  }
+  dischargeSummary(patientId) {
+    return buildDischargeSummary(this.plan(patientId));
   }
   completeTask(patientId, taskId, complete) {
     z.boolean().parse(complete);

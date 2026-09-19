@@ -197,7 +197,7 @@ test('HTTP help response/resolution retain history and review gates; MCP exposes
     await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp/demo-001`)));
     const tools = (await client.listTools()).tools.map((tool) => tool.name).sort();
     assert.deepEqual(tools, [
-      'execute_approved_reminder', 'get_discharge_plan', 'lookup_patient_education',
+      'execute_approved_reminder', 'get_discharge_plan', 'get_discharge_summary', 'lookup_patient_education',
       'propose_cited_task', 'propose_reminder', 'search_discharge_instructions',
     ]);
   } finally {

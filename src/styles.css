@@ -1526,6 +1526,77 @@ main {
 .message-text {
   overflow-wrap: anywhere;
 }
+.message-text .source-answer {
+  white-space: pre-wrap;
+}
+.guidance-history-note {
+  color: #92400e;
+  background: #fffbeb;
+  border-left: 3px solid #d97706;
+  padding: 8px 12px;
+  margin: 12px 0 0;
+}
+.summary-workspace {
+  min-width: 0;
+}
+.summary-next,
+.summary-group {
+  margin-top: 18px;
+  padding: 20px;
+}
+.summary-group > summary,
+.agent-team-overview > summary {
+  cursor: pointer;
+  font-weight: 650;
+  padding: 6px 0;
+}
+.summary-item {
+  border-top: 1px solid #dbe3ed;
+  padding: 18px 0;
+}
+.summary-item blockquote {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 12px 0;
+  border-left: 3px solid var(--accent);
+  padding: 8px 14px;
+  line-height: 1.7;
+}
+.summary-item p,
+.summary-group > p,
+.summary-next p,
+.summary-footer {
+  line-height: 1.7;
+}
+.summary-gaps {
+  color: #92400e;
+  line-height: 1.7;
+}
+.summary-source-actions,
+.assistant-quick-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.assistant-quick-actions,
+.agent-team-overview {
+  margin: 8px 18px;
+}
+.agent-team-overview,
+.specialist-label,
+.message-education {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #475569;
+}
+.agent-team-overview li p {
+  margin-top: 3px;
+}
+.message-education {
+  border-top: 1px solid #dbe3ed;
+  margin-top: 12px;
+  padding-top: 12px;
+}
 .message-text .markdown-body {
   white-space: normal;
 }

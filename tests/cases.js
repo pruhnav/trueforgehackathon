@@ -5,8 +5,12 @@ import { join } from 'node:path';
 import { Store } from '../server/store.js';
 import { sourceSearch, agentSpec } from '../server/trueforge.js';
 import { reviewCases } from './review-cases.js';
+import { guidanceCases } from './guidance-cases.js';
+import { summaryCases } from './summary-cases.js';
 
 export const cases = [
+  ...summaryCases,
+  ...guidanceCases,
   ...reviewCases,
   [
     'Help persists after reopening SQLite and remains patient scoped',
