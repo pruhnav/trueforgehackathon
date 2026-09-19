@@ -1,0 +1,29 @@
+{
+  "data": [
+    {
+      "id": "01m2xww8dsz1zyy9szh4d7h3b6",
+      "session_id": "01m2xww85k2c8vj3e2tnj116jw",
+      "previous_turn_id": null,
+      "input": [
+        {
+          "type": "user.message",
+          "content": "What paperwork should I bring to follow-up? Cite the discharge record."
+        }
+      ],
+      "state": {
+        "status": "error",
+        "message": "Request failed (401): Your API key has been invalidated.",
+        "completed_at": "2026-09-19T22:34:06.148Z",
+        "metrics": {
+          "total_input_tokens": 0,
+          "total_output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "created_at": "2026-09-19T22:34:03.873Z"
+    }
+  ],
+  "pagination": {
+    "limit": 25
+  }
+}

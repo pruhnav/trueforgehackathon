@@ -1,10 +1,36 @@
 import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { Store } from '../server/store.js';
 import { sourceSearch, agentSpec } from '../server/trueforge.js';
 import { reviewCases } from './review-cases.js';
 
 export const cases = [
   ...reviewCases,
+  [
+    'Help persists after reopening SQLite and remains patient scoped',
+    () => {
+      const dir = mkdtempSync(join(tmpdir(), 'homeward-eval-'));
+      let disk;
+      try {
+        disk = new Store(join(dir, 'test.sqlite'));
+        const opened = disk.requestHelp('demo-001', 'demo-001-task-4', true);
+        disk.close();
+        disk = new Store(join(dir, 'test.sqlite'));
+        assert.deepEqual(disk.get('task', opened.id), opened);
+        assert.throws(() => disk.requestHelp('demo-002', opened.id, false), {
+          code: 'PATIENT_SCOPE',
+        });
+        assert.throws(() => disk.taskHistory('demo-002', opened.id), { code: 'PATIENT_SCOPE' });
+        assert.deepEqual(disk.get('task', opened.id), opened);
+        assert.equal(disk.taskHistory('demo-001', opened.id).history.length, 1);
+      } finally {
+        disk?.close();
+        rmSync(dir, { recursive: true, force: true });
+      }
+    },
+  ],
   [
     'Every fixture task has an exact source',
     (store) => {

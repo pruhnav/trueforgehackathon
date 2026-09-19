@@ -1,0 +1,15 @@
+{
+  "commit": "0ce9dad2a4a9dfd4815cad0a742fb46baa29bad5",
+  "verifiedAt": "2026-09-19T22:37:06.900963+00:00",
+  "url": "http://localhost:8001",
+  "health": {
+    "ok": true,
+    "app": "Homeward",
+    "syntheticOnly": true,
+    "demoDate": "2026-09-19"
+  },
+  "servedAssetsMatchVerifiedBuild": [
+    "/assets/index-DVhybMBQ.js",
+    "/assets/index-B7zNXBoo.css"
+  ]
+}

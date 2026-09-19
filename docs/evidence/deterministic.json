@@ -1,0 +1,156 @@
+{
+  "commit": "0ce9dad2a4a9dfd4815cad0a742fb46baa29bad5",
+  "dirty": true,
+  "node": "v22.23.1",
+  "evaluatedFiles": {
+    "data/synthea-sample.json": "46ec21d276045c8cfb3bc6dbddc17f60890399d807e327ea96ad4419a5b3c4b4",
+    "package-lock.json": "68e317bda5a12afdd1b1dcb401f9840696bf926ad6e61d999b5c745e2c8e078c",
+    "package.json": "dad5861b651915943a6e84dd700db8342368d748b894ff136ef65e86a504cf09",
+    "scripts/evaluate-live.js": "c1a1f7b8c16930f8049696d82b175782081bc6c6feb4c9a1bcb0792948b81a4e",
+    "scripts/evaluate.js": "9ee7be0970e0b363bd927b95edda0571367344e83743742c90bdf8ce0a2289b6",
+    "scripts/evaluations/assess.js": "01a338aff6ac9abeb711bd589bd50b97ae4b3bc885b680698d64b637b9b15967",
+    "scripts/evaluations/metadata.js": "264846901cf24cd5827f02bd9872a73b02caac595d7f4190c285b61f03d0d796",
+    "scripts/evaluations/scenarios.js": "876bb3bc43808f2404a882e3a519015f86bba14b7873e84c4aa4c9c5f16fdbc3",
+    "scripts/ingest-synthea.py": "35163d39261f3c6ce7ce67476191fade83bdcdb8beb4ed9c8123c90540d0268e",
+    "scripts/setup-trueforge.js": "f01637cf157d28ea61bd8987ba3c3e66d303777f26e84f43260779cfe05029da",
+    "scripts/smoke-trueforge.js": "3dc51e048f4f0e1768aee4c073a3b88bb5bcd5dc2827e375a04e764f91e0efc0",
+    "server/app.js": "c84f6bb5a30938386905e39a93132a915a9f02e53455ec707f5d5e79602ec345",
+    "server/education.js": "0340a1e9c286bc453c94be6fa7ca71da6c2f9ad2fbc850bd434f4cd16f42ccf1",
+    "server/fixtures.js": "cb340f562ba8d09c326c771f9698d1e222d68cd6e9ad1e1f1254aa0f1c53f8e9",
+    "server/index.js": "e243426f6983d4c1277cc7d62d8ca0545b1a4021b687b4e36aeb3d30a4831ff7",
+    "server/mcp.js": "683899c03402821eccf21ee1f1bdb513b8175a393a04bd714dbe786b52cfdfb3",
+    "server/store.js": "9ecb09d9ae88e8bf95f2c7ae8ded48e2439b5a22f0a8eeeb57400c7f13bef083",
+    "server/trueforge.js": "05a9637d56f3b1c75d7197365d7396daba3e5e813d8c7a4a8be481d2b5b59b68",
+    "tests/cases.js": "5765840e359a954233a4164b583da83984a4376bc12bae24b2d395d2c1d68548",
+    "tests/domain.test.js": "6f51a1f03701a2b2fe9a983da7a4a7befcbd07befa678aabb56703089cf450db",
+    "tests/education.test.js": "19d27c9cf0f0668a947dd73338f5552cc7817f586049154da70731872cc35b0f",
+    "tests/evaluation-harness.test.js": "eb55ddce29206a5d582338cf7e9597d84c23b1a8e17c6df9db9e94e3406ac302",
+    "tests/http.test.js": "ca00cf9f7a3e7c7f90b1c441ca16f92a1f6cd0ef164ba47445b7541cb70dd663",
+    "tests/review-cases.js": "8fdf09ea0bd1c915c349e5be9c420de3df6c6bf80d00e50970d9a20aad214fd8",
+    "tests/review-http.test.js": "056825aa77da715cc3434a3fd15959691af1e30c46ceb56417f1f9d7bf3dc4d2",
+    "tests/review-ui.test.jsx": "73bc2c2b20a2a02ca13b31cef2cb61d26647cbd9227c164697195d4d18335a51",
+    "tests/review.test.js": "b5c81dcdbc84831056c608dc1dace8462092580f164d67277d069e76605f5a37",
+    "tests/synthea-help.test.js": "1bff88d6ec319e5181120b934e2b22d29f13be9faadb18536f577be29e8d7dfa",
+    "tests/trueforge.test.js": "6752fa9393909adbfa1ad0ea77fceb9059530d1638199c68c0d3307b6c042f1c",
+    "tests/ui.test.jsx": "3f187ec05fa77e24540f6466b6c7bc1a75fd198f4b2bdb3225dccd9fe8d823bf"
+  },
+  "ranAt": "2026-09-19T22:04:36.493Z",
+  "type": "deterministic-runtime-guardrails",
+  "cases": [
+    {
+      "name": "Review activates an exact instruction with an evidenced date and separate reminder approval",
+      "passed": true,
+      "durationMs": 18
+    },
+    {
+      "name": "Review with no deadline leaves due null and prevents reminders",
+      "passed": true,
+      "durationMs": 5
+    },
+    {
+      "name": "Clarify and reject preserve sources and cannot be bypassed by completion or a duplicate proposal",
+      "passed": true,
+      "durationMs": 6
+    },
+    {
+      "name": "Synthea history requires a separate exact instruction; a review note cannot authorize it",
+      "passed": true,
+      "durationMs": 7
+    },
+    {
+      "name": "Invalid calendar dates and unsupported date evidence never mutate the task",
+      "passed": true,
+      "durationMs": 11
+    },
+    {
+      "name": "Review commands reject foreign tasks, foreign evidence, fabricated quotes, and reviewer impersonation",
+      "passed": true,
+      "durationMs": 6
+    },
+    {
+      "name": "Review retries replay one receipt; stale revisions and reused keys cannot overwrite newer decisions",
+      "passed": true,
+      "durationMs": 6
+    },
+    {
+      "name": "A new reviewed instruction invalidates old reminders even when status and date are unchanged",
+      "passed": true,
+      "durationMs": 12
+    },
+    {
+      "name": "Responding to and resolving help never approves an unverified task",
+      "passed": true,
+      "durationMs": 7
+    },
+    {
+      "name": "Help persists after reopening SQLite and remains patient scoped",
+      "passed": true,
+      "durationMs": 28
+    },
+    {
+      "name": "Every fixture task has an exact source",
+      "passed": true,
+      "durationMs": 5
+    },
+    {
+      "name": "Unknown deadlines stay unknown",
+      "passed": true,
+      "durationMs": 2
+    },
+    {
+      "name": "Execution without approval is blocked",
+      "passed": true,
+      "durationMs": 3
+    },
+    {
+      "name": "Patient boundaries reject foreign records",
+      "passed": true,
+      "durationMs": 4
+    },
+    {
+      "name": "Retry after response loss creates no duplicate",
+      "passed": true,
+      "durationMs": 5
+    },
+    {
+      "name": "Declined actions cannot execute",
+      "passed": true,
+      "durationMs": 4
+    },
+    {
+      "name": "Fabricated citations are rejected",
+      "passed": true,
+      "durationMs": 2
+    },
+    {
+      "name": "Imported instructions require human review",
+      "passed": true,
+      "durationMs": 3
+    },
+    {
+      "name": "Missing answers are not invented",
+      "passed": true,
+      "durationMs": 3
+    },
+    {
+      "name": "Changed tasks invalidate pending execution",
+      "passed": true,
+      "durationMs": 6
+    },
+    {
+      "name": "Repeated proposals reuse the existing action",
+      "passed": true,
+      "durationMs": 3
+    },
+    {
+      "name": "Agent runs have bounded tool access and iterations",
+      "passed": true,
+      "durationMs": 2
+    }
+  ],
+  "summary": {
+    "passed": 22,
+    "failed": 0,
+    "total": 22
+  }
+}

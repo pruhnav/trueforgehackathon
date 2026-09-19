@@ -1,0 +1,411 @@
+{
+  "commit": "0ce9dad2a4a9dfd4815cad0a742fb46baa29bad5",
+  "startedAt": "2026-09-19T22:34:06.854Z",
+  "mode": "real-browser-source-search",
+  "viewport": {
+    "width": 1600,
+    "height": 1000
+  },
+  "steps": [
+    {
+      "at": "2026-09-19T22:34:12.006Z",
+      "result": "pass",
+      "description": "Built production frontend loads against the real isolated API."
+    },
+    {
+      "at": "2026-09-19T22:34:13.426Z",
+      "result": "pass",
+      "description": "Paperwork source search returns source excerpts in the persistent assistant."
+    },
+    {
+      "at": "2026-09-19T22:34:18.814Z",
+      "result": "pass",
+      "description": "Patient help request reaches care-team UI; resolution preserves null due and review gate."
+    },
+    {
+      "at": "2026-09-19T22:34:19.823Z",
+      "result": "pass",
+      "description": "Approve → execute → simulated response loss → retry → calendar download creates one reminder."
+    },
+    {
+      "at": "2026-09-19T22:34:25.402Z",
+      "result": "pass",
+      "description": "Browser import → sourced task proposal → care-team dated confirmation preserves original citation."
+    },
+    {
+      "at": "2026-09-19T22:34:25.760Z",
+      "result": "pass",
+      "description": "Switching patients clears the previous patient assistant conversation."
+    },
+    {
+      "at": "2026-09-19T22:34:26.167Z",
+      "result": "pass",
+      "description": "Synthea document provenance is accessible through the actual browser UI."
+    }
+  ],
+  "captures": [
+    {
+      "file": "docs/assets/journey/01-recovery.png",
+      "caption": "Alex sees the next task, deadlines, and unresolved laboratory question.",
+      "sha256": "e33b3e24e2e4fc3dd097446003899e8170f4d37b81215d1a49864fd4b65cfce0"
+    },
+    {
+      "file": "docs/assets/journey/02-source.png",
+      "caption": "The follow-up task links to its original discharge passage.",
+      "sha256": "ba65e55f8874c1418ebc2630e818977832203a4c33149eff0649c225a75676d2"
+    },
+    {
+      "file": "docs/assets/journey/03-source-search.png",
+      "caption": "Paperwork guidance is retrieved as exact excerpts; no live model is involved.",
+      "sha256": "b80bc2213a76598b65714e0a14efc40e81a603fcfaf2dc381254ae476ac9ae7a"
+    },
+    {
+      "file": "docs/assets/journey/04-help-review.png",
+      "caption": "Resolving the help conversation preserves the instruction review gate and unknown date.",
+      "sha256": "d297d96136bd6bb54087c437f293f0b55b2a71faea21de5896191d787f1cf41f"
+    },
+    {
+      "file": "docs/assets/journey/05-approval.png",
+      "caption": "The patient explicitly approves a local reminder, separate from instruction review.",
+      "sha256": "aa4ebff67d37cd92b576354b9c1ef2645c6f3b641e3d5610c96151787e46596a"
+    },
+    {
+      "file": "docs/assets/journey/06-safe-retry.png",
+      "caption": "A retry returns one saved reminder and a real downloadable calendar file.",
+      "sha256": "6f9dd3773cc033bfd7f2601589e4d7acd522aa4f6962cb8ccd10882b4709f547"
+    },
+    {
+      "file": "docs/assets/journey/07-import-review.png",
+      "caption": "An imported passage becomes actionable only after explicit review with date evidence.",
+      "sha256": "c429d9314b93256f804af96278b1e4942456efb084a07e4eb79042e99f1b4408"
+    },
+    {
+      "file": "docs/assets/journey/08-activity.png",
+      "caption": "Actual local traces expose review, approval, reminder creation, and deduplication.",
+      "sha256": "15289d7ea0dbb92a97dc80a1d8d4e99162ec096c1cd395fe3626ffb2737399d3"
+    },
+    {
+      "file": "docs/assets/journey/09-provenance.png",
+      "caption": "Synthea history displays source provenance and stays distinct from discharge instructions.",
+      "sha256": "b104ab96dffb31b400a7b7e8087fac13fe0f3ef2e0487a6971b0c1062d8520a7"
+    },
+    {
+      "file": "docs/assets/journey/10-mobile.png",
+      "caption": "Mobile-width document workspace: a responsive-layout capture, not an accessibility certification.",
+      "sha256": "9af95776d188bf5828ce20e2431baa7220b1b12fee2d446c10f91a9fac1ce081"
+    }
+  ],
+  "pageErrors": [],
+  "apiErrors": [
+    {
+      "status": 504,
+      "path": "/api/patients/demo-001/actions/63298a45-1791-47b9-9503-75ecea09727e/execute"
+    }
+  ],
+  "networkFailures": [
+    {
+      "url": "http://127.0.0.1:59271/api/patients/demo-001/actions/63298a45-1791-47b9-9503-75ecea09727e/calendar",
+      "error": "net::ERR_ABORTED"
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+  ],
+  "paidRequests": 0,
+  "browser": "150.0.7871.125",
+  "mobileHorizontalOverflow": false,
+  "runnerSha256": "3cce5ef571ac069d984ccfaf59eaa91891723b15351afc2b94ba2c88720a5b53",
+  "result": "pass",
+  "finishedAt": "2026-09-19T22:34:26.357Z",
+  "finalTasks": [
+    {
+      "revision": 1,
+      "instructionRevision": 1,
+      "instruction": {
+        "documentId": "doc-demo-001",
+        "sectionId": "s1",
+        "quote": "Arrange a follow-up visit with Dr. Maya Chen within seven days of discharge. Call the clinic if you need help arranging the visit."
+      },
+      "dateEvidence": {
+        "kind": "legacy",
+        "note": "Deadline predates captured review evidence."
+      },
+      "lastReviewId": null,
+      "helpRequestId": null,
+      "lastHelpAuditId": null,
+      "id": "demo-001-task-1",
+      "patientId": "demo-001",
+      "title": "Arrange your follow-up visit",
+      "detail": "Arrange a follow-up visit with Dr. Maya Chen within seven days of discharge. Call the clinic if you need help arranging the visit.",
+      "category": "appointment",
+      "due": "2026-09-26",
+      "status": "pending",
+      "source": {
+        "documentId": "doc-demo-001",
+        "sectionId": "s1",
+        "quote": "Arrange a follow-up visit with Dr. Maya Chen within seven days of discharge. Call the clinic if you need help arranging the visit."
+      },
+      "completedAt": null
+    },
+    {
+      "revision": 1,
+      "instructionRevision": 1,
+      "instruction": {
+        "documentId": "doc-demo-001",
+        "sectionId": "s2",
+        "quote": "Bring your discharge summary and current medication list to the follow-up visit."
+      },
+      "dateEvidence": null,
+      "lastReviewId": null,
+      "helpRequestId": null,
+      "lastHelpAuditId": null,
+      "id": "demo-001-task-2",
+      "patientId": "demo-001",
+      "title": "Gather your visit paperwork",
+      "detail": "Bring your discharge summary and current medication list to the follow-up visit.",
+      "category": "preparation",
+      "due": null,
+      "status": "pending",
+      "source": {
+        "documentId": "doc-demo-001",
+        "sectionId": "s2",
+        "quote": "Bring your discharge summary and current medication list to the follow-up visit."
+      },
+      "completedAt": null
+    },
+    {
+      "revision": 1,
+      "instructionRevision": 1,
+      "instruction": {
+        "documentId": "doc-demo-001",
+        "sectionId": "s3",
+        "quote": "Complete the recovery check-in on September 21, 2026. Record any questions you want to discuss with your care team."
+      },
+      "dateEvidence": {
+        "kind": "legacy",
+        "note": "Deadline predates captured review evidence."
+      },
+      "lastReviewId": null,
+      "helpRequestId": null,
+      "lastHelpAuditId": null,
+      "id": "demo-001-task-3",
+      "patientId": "demo-001",
+      "title": "Complete your recovery check-in",
+      "detail": "Complete the recovery check-in on September 21, 2026. Record any questions you want to discuss with your care team.",
+      "category": "check-in",
+      "due": "2026-09-21",
+      "status": "pending",
+      "source": {
+        "documentId": "doc-demo-001",
+        "sectionId": "s3",
+        "quote": "Complete the recovery check-in on September 21, 2026. Record any questions you want to discuss with your care team."
+      },
+      "completedAt": null
+    },
+    {
+      "revision": 3,
+      "instructionRevision": 1,
+      "instruction": null,
+      "dateEvidence": null,
+      "lastReviewId": null,
+      "helpRequestId": null,
+      "lastHelpAuditId": "71065365-6b99-4d3e-b5d2-b321a02548e3",
+      "id": "demo-001-task-4",
+      "patientId": "demo-001",
+      "title": "Clarify the laboratory instructions",
+      "detail": "The discharge note mentions a repeat laboratory test, but does not specify the test or a date. Contact the discharge team for clarification before arranging it.",
+      "category": "clarification",
+      "due": null,
+      "status": "needs_clarification",
+      "source": {
+        "documentId": "doc-demo-001",
+        "sectionId": "s4",
+        "quote": "The discharge note mentions a repeat laboratory test, but does not specify the test or a date. Contact the discharge team for clarification before arranging it."
+      },
+      "completedAt": null,
+      "helpRequestedAt": null
+    },
+    {
+      "revision": 1,
+      "instructionRevision": 1,
+      "instruction": {
+        "documentId": "doc-demo-002",
+        "sectionId": "s1",
+        "quote": "Contact your care team by September 18, 2026 to arrange your follow-up visit."
+      },
+      "dateEvidence": {
+        "kind": "legacy",
+        "note": "Deadline predates captured review evidence."
+      },
+      "lastReviewId": null,
+      "helpRequestId": null,
+      "lastHelpAuditId": null,
+      "id": "demo-002-task-1",
+      "patientId": "demo-002",
+      "title": "Contact your care team",
+      "detail": "Contact your care team by September 18, 2026 to arrange your follow-up visit.",
+      "category": "appointment",
+      "due": "2026-09-18",
+      "status": "pending",
+      "source": {
+        "documentId": "doc-demo-002",
+        "sectionId": "s1",
+        "quote": "Contact your care team by September 18, 2026 to arrange your follow-up visit."
+      },
+      "completedAt": null
+    },
+    {
+      "revision": 1,
+      "instructionRevision": 1,
+      "instruction": {
+        "documentId": "doc-demo-002",
+        "sectionId": "s2",
+        "quote": "Bring your discharge summary to your next visit."
+      },
+      "dateEvidence": null,
+      "lastReviewId": null,
+      "helpRequestId": null,
+      "lastHelpAuditId": null,
+      "id": "demo-002-task-2",
+      "patientId": "demo-002",
+      "title": "Gather your visit paperwork",
+      "detail": "Bring your discharge summary to your next visit.",
+      "category": "preparation",
+      "due": null,
+      "status": "pending",
+      "source": {
+        "documentId": "doc-demo-002",
+        "sectionId": "s2",
+        "quote": "Bring your discharge summary to your next visit."
+      },
+      "completedAt": null
+    },
+    {
+      "revision": 1,
+      "instructionRevision": 1,
+      "instruction": {
+        "documentId": "doc-demo-003",
+        "sectionId": "s1",
+        "quote": "Arrange a follow-up visit by September 25, 2026."
+      },
+      "dateEvidence": {
+        "kind": "legacy",
+        "note": "Deadline predates captured review evidence."
+      },
+      "lastReviewId": null,
+      "helpRequestId": null,
+      "lastHelpAuditId": null,
+      "id": "demo-003-task-1",
+      "patientId": "demo-003",
+      "title": "Arrange your follow-up visit",
+      "detail": "Arrange a follow-up visit by September 25, 2026.",
+      "category": "appointment",
+      "due": "2026-09-25",
+      "status": "pending",
+      "source": {
+        "documentId": "doc-demo-003",
+        "sectionId": "s1",
+        "quote": "Arrange a follow-up visit by September 25, 2026."
+      },
+      "completedAt": null
+    },
+    {
+      "revision": 1,
+      "instructionRevision": 1,
+      "instruction": {
+        "documentId": "doc-demo-003",
+        "sectionId": "s2",
+        "quote": "Prepare a list of questions for your care team before your next visit."
+      },
+      "dateEvidence": null,
+      "lastReviewId": null,
+      "helpRequestId": null,
+      "lastHelpAuditId": null,
+      "id": "demo-003-task-2",
+      "patientId": "demo-003",
+      "title": "Prepare questions for your care team",
+      "detail": "Prepare a list of questions for your care team before your next visit.",
+      "category": "preparation",
+      "due": null,
+      "status": "completed",
+      "source": {
+        "documentId": "doc-demo-003",
+        "sectionId": "s2",
+        "quote": "Prepare a list of questions for your care team before your next visit."
+      },
+      "completedAt": null
+    },
+    {
+      "revision": 1,
+      "instructionRevision": 1,
+      "instruction": null,
+      "dateEvidence": null,
+      "lastReviewId": null,
+      "helpRequestId": null,
+      "lastHelpAuditId": null,
+      "id": "synthea-d537941e-1fb7-9868-939a-a26252da8be1-review",
+      "patientId": "synthea-d537941e-1fb7-9868-939a-a26252da8be1",
+      "title": "Verify discharge instructions with the care team",
+      "detail": "This historical sample has no verified discharge regimen. Review the original instructions before creating dated tasks.",
+      "category": "clarification",
+      "due": null,
+      "status": "needs_clarification",
+      "completedAt": null,
+      "source": {
+        "documentId": "doc-synthea-d537941e-1fb7-9868-939a-a26252da8be1",
+        "sectionId": "s1",
+        "quote": "Synthetic inpatient encounter: 2026-05-14T18:27:12Z to 2026-05-15T18:27:12Z. Admission to surgical department (procedure). This is a historical dataset snapshot, not discharge instructions."
+      }
+    },
+    {
+      "revision": 2,
+      "instructionRevision": 2,
+      "instruction": {
+        "documentId": "4eb760de-d5b1-4b32-8a93-dad6641d069e",
+        "sectionId": "s1",
+        "quote": "Bring your discharge paperwork on September 26, 2026."
+      },
+      "dateEvidence": {
+        "kind": "source",
+        "source": {
+          "documentId": "4eb760de-d5b1-4b32-8a93-dad6641d069e",
+          "sectionId": "s1",
+          "quote": "Bring your discharge paperwork on September 26, 2026."
+        }
+      },
+      "lastReviewId": "f65f4f6f-ffa2-4d1a-beed-2cec48871fc9",
+      "helpRequestId": null,
+      "lastHelpAuditId": null,
+      "id": "6268364e-e06f-4fdf-b904-c21cad43a25d",
+      "patientId": "demo-001",
+      "title": "Review imported instruction",
+      "detail": "Bring your discharge paperwork on September 26, 2026.",
+      "category": "clarification",
+      "due": "2026-09-26",
+      "status": "pending",
+      "source": {
+        "documentId": "4eb760de-d5b1-4b32-8a93-dad6641d069e",
+        "sectionId": "s1",
+        "quote": "Bring your discharge paperwork on September 26, 2026."
+      },
+      "completedAt": null
+    }
+  ],
+  "finalActions": [
+    {
+      "id": "63298a45-1791-47b9-9503-75ecea09727e",
+      "patientId": "demo-001",
+      "taskId": "demo-001-task-1",
+      "type": "reminder",
+      "title": "Arrange your follow-up visit",
+      "due": "2026-09-26",
+      "taskInstructionRevision": 1,
+      "taskFingerprint": "a343a2f5f6e7d7df05e38774d6323519d46c6ca34ff2a96a8ae50a80ea5635de",
+      "status": "executed",
+      "createdAt": "2026-09-19T22:34:18.933Z",
+      "approvedAt": "2026-09-19T22:34:19.173Z",
+      "executedAt": "2026-09-19T22:34:19.346Z",
+      "receipt": "LOCAL-63298A45"
+    }
+  ]
+}

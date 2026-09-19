@@ -1,4 +1,5 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { metadata } from './evaluations/metadata.js';
 import { cases, runCase } from '../tests/cases.js';
 const results = [];
 for (const [name, fn] of cases) {
@@ -11,9 +12,15 @@ for (const [name, fn] of cases) {
   }
 }
 const report = {
+  ...metadata(),
   ranAt: new Date().toISOString(),
   type: 'deterministic-runtime-guardrails',
   cases: results,
+  summary: {
+    passed: results.filter((r) => r.passed).length,
+    failed: results.filter((r) => !r.passed).length,
+    total: results.length,
+  },
 };
 mkdirSync('.local', { recursive: true });
 writeFileSync('.local/evaluation.json', JSON.stringify(report, null, 2));

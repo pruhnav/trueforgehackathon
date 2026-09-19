@@ -1,0 +1,335 @@
+
+> homeward-discharge-copilot@1.0.0 check
+> npm run test && npm run build
+
+
+> homeward-discharge-copilot@1.0.0 test
+> node --test tests/*.test.js && node --import tsx --test tests/*.test.jsx
+
+TAP version 13
+# (node:22233) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Review activates an exact instruction with an evidenced date and separate reminder approval
+ok 1 - Review activates an exact instruction with an evidenced date and separate reminder approval
+  ---
+  duration_ms: 17.503688
+  type: 'test'
+  ...
+# Subtest: Review with no deadline leaves due null and prevents reminders
+ok 2 - Review with no deadline leaves due null and prevents reminders
+  ---
+  duration_ms: 4.29035
+  type: 'test'
+  ...
+# Subtest: Clarify and reject preserve sources and cannot be bypassed by completion or a duplicate proposal
+ok 3 - Clarify and reject preserve sources and cannot be bypassed by completion or a duplicate proposal
+  ---
+  duration_ms: 99.486355
+  type: 'test'
+  ...
+# Subtest: Synthea history requires a separate exact instruction; a review note cannot authorize it
+ok 4 - Synthea history requires a separate exact instruction; a review note cannot authorize it
+  ---
+  duration_ms: 7.035485
+  type: 'test'
+  ...
+# Subtest: Invalid calendar dates and unsupported date evidence never mutate the task
+ok 5 - Invalid calendar dates and unsupported date evidence never mutate the task
+  ---
+  duration_ms: 6.800424
+  type: 'test'
+  ...
+# Subtest: Review commands reject foreign tasks, foreign evidence, fabricated quotes, and reviewer impersonation
+ok 6 - Review commands reject foreign tasks, foreign evidence, fabricated quotes, and reviewer impersonation
+  ---
+  duration_ms: 4.491046
+  type: 'test'
+  ...
+# Subtest: Review retries replay one receipt; stale revisions and reused keys cannot overwrite newer decisions
+ok 7 - Review retries replay one receipt; stale revisions and reused keys cannot overwrite newer decisions
+  ---
+  duration_ms: 6.261637
+  type: 'test'
+  ...
+# Subtest: A new reviewed instruction invalidates old reminders even when status and date are unchanged
+ok 8 - A new reviewed instruction invalidates old reminders even when status and date are unchanged
+  ---
+  duration_ms: 10.262484
+  type: 'test'
+  ...
+# Subtest: Responding to and resolving help never approves an unverified task
+ok 9 - Responding to and resolving help never approves an unverified task
+  ---
+  duration_ms: 5.584746
+  type: 'test'
+  ...
+# Subtest: Help persists after reopening SQLite and remains patient scoped
+ok 10 - Help persists after reopening SQLite and remains patient scoped
+  ---
+  duration_ms: 16.568873
+  type: 'test'
+  ...
+# Subtest: Every fixture task has an exact source
+ok 11 - Every fixture task has an exact source
+  ---
+  duration_ms: 3.82416
+  type: 'test'
+  ...
+# Subtest: Unknown deadlines stay unknown
+ok 12 - Unknown deadlines stay unknown
+  ---
+  duration_ms: 2.45118
+  type: 'test'
+  ...
+# Subtest: Execution without approval is blocked
+ok 13 - Execution without approval is blocked
+  ---
+  duration_ms: 13.059917
+  type: 'test'
+  ...
+# Subtest: Patient boundaries reject foreign records
+ok 14 - Patient boundaries reject foreign records
+  ---
+  duration_ms: 278.96368
+  type: 'test'
+  ...
+# Subtest: Retry after response loss creates no duplicate
+ok 15 - Retry after response loss creates no duplicate
+  ---
+  duration_ms: 8.587384
+  type: 'test'
+  ...
+# Subtest: Declined actions cannot execute
+ok 16 - Declined actions cannot execute
+  ---
+  duration_ms: 8.946302
+  type: 'test'
+  ...
+# Subtest: Fabricated citations are rejected
+ok 17 - Fabricated citations are rejected
+  ---
+  duration_ms: 127.114911
+  type: 'test'
+  ...
+# Subtest: Imported instructions require human review
+ok 18 - Imported instructions require human review
+  ---
+  duration_ms: 14.62869
+  type: 'test'
+  ...
+# Subtest: Missing answers are not invented
+ok 19 - Missing answers are not invented
+  ---
+  duration_ms: 3.719868
+  type: 'test'
+  ...
+# Subtest: Changed tasks invalidate pending execution
+ok 20 - Changed tasks invalidate pending execution
+  ---
+  duration_ms: 2.992804
+  type: 'test'
+  ...
+# Subtest: Repeated proposals reuse the existing action
+ok 21 - Repeated proposals reuse the existing action
+  ---
+  duration_ms: 2.844429
+  type: 'test'
+  ...
+# Subtest: Agent runs have bounded tool access and iterations
+ok 22 - Agent runs have bounded tool access and iterations
+  ---
+  duration_ms: 1.844821
+  type: 'test'
+  ...
+# Subtest: State survives reopening the database
+ok 23 - State survives reopening the database
+  ---
+  duration_ms: 10.712965
+  type: 'test'
+  ...
+# Subtest: Education lookup filters URLs, caches results, and uses no patient data
+ok 24 - Education lookup filters URLs, caches results, and uses no patient data
+  ---
+  duration_ms: 166.650911
+  type: 'test'
+  ...
+# Subtest: Education failure falls back without changing the care plan
+ok 25 - Education failure falls back without changing the care plan
+  ---
+  duration_ms: 20.348741
+  type: 'test'
+  ...
+# (node:22235) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: evaluation requires a bounded authorization and rejects unknown scenarios
+ok 26 - evaluation requires a bounded authorization and rejects unknown scenarios
+  ---
+  duration_ms: 2.444115
+  type: 'test'
+  ...
+# Subtest: assessor does not pass answer quality, catches tool attempts and unauthorized writes
+ok 27 - assessor does not pass answer quality, catches tool attempts and unauthorized writes
+  ---
+  duration_ms: 1.309737
+  type: 'test'
+  ...
+# Subtest: isolated harness records a real MCP exchange with a simulated runtime; never a live-model claim
+ok 28 - isolated harness records a real MCP exchange with a simulated runtime; never a live-model claim
+  ---
+  duration_ms: 389.80173
+  type: 'test'
+  ...
+# (node:22236) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: HTTP API and real MCP client exercise the approval boundary
+ok 29 - HTTP API and real MCP client exercise the approval boundary
+  ---
+  duration_ms: 831.07562
+  type: 'test'
+  ...
+# (node:22237) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: HTTP import -> proposal -> evidenced review -> separately approved date-only calendar
+ok 30 - HTTP import -> proposal -> evidenced review -> separately approved date-only calendar
+  ---
+  duration_ms: 258.567846
+  type: 'test'
+  ...
+# Subtest: HTTP review validation provides explicit errors without changing task state
+ok 31 - HTTP review validation provides explicit errors without changing task state
+  ---
+  duration_ms: 141.500312
+  type: 'test'
+  ...
+# Subtest: concurrent HTTP decisions require reload and changed instructions require new reminder approval
+ok 32 - concurrent HTTP decisions require reload and changed instructions require new reminder approval
+  ---
+  duration_ms: 68.209809
+  type: 'test'
+  ...
+# Subtest: HTTP help response/resolution retain history and review gates; MCP exposes neither operation
+ok 33 - HTTP help response/resolution retain history and review gates; MCP exposes neither operation
+  ---
+  duration_ms: 107.709233
+  type: 'test'
+  ...
+# (node:22238) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: review/help audit, retry receipts, and revisions survive reopening SQLite
+ok 34 - review/help audit, retry receipts, and revisions survive reopening SQLite
+  ---
+  duration_ms: 121.551563
+  type: 'test'
+  ...
+# Subtest: legacy upgrade preserves local records and receipts but requires reapproval for unbound actions
+ok 35 - legacy upgrade preserves local records and receipts but requires reapproval for unbound actions
+  ---
+  duration_ms: 39.106223
+  type: 'test'
+  ...
+# Subtest: task mutation, audit, trace, and command receipt roll back together on storage failure
+ok 36 - task mutation, audit, trace, and command receipt roll back together on storage failure
+  ---
+  duration_ms: 8.226015
+  type: 'test'
+  ...
+# Subtest: separate SQLite connections cannot commit reviews from the same displayed revision
+ok 37 - separate SQLite connections cannot commit reviews from the same displayed revision
+  ---
+  duration_ms: 13.596898
+  type: 'test'
+  ...
+# Subtest: reminder fingerprints catch instruction/source/date changes and completion round trips
+ok 38 - reminder fingerprints catch instruction/source/date changes and completion round trips
+  ---
+  duration_ms: 6.325497
+  type: 'test'
+  ...
+# Subtest: unsupported document trust and mutated source passages fail closed
+ok 39 - unsupported document trust and mutated source passages fail closed
+  ---
+  duration_ms: 7.91747
+  type: 'test'
+  ...
+# Subtest: help resolution resumes only an unchanged approved reminder and logs no response text
+ok 40 - help resolution resumes only an unchanged approved reminder and logs no response text
+  ---
+  duration_ms: 5.154471
+  type: 'test'
+  ...
+# Subtest: source date formats are explicit and relative dates require human clarification
+ok 41 - source date formats are explicit and relative dates require human clarification
+  ---
+  duration_ms: 5.651843
+  type: 'test'
+  ...
+# (node:22239) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: help requests preserve review gates and block stale reminder execution
+ok 42 - help requests preserve review gates and block stale reminder execution
+  ---
+  duration_ms: 16.58688
+  type: 'test'
+  ...
+# Subtest: Synthea snapshot is isolated, traceable, historical, and cannot schedule unverified directions
+ok 43 - Synthea snapshot is isolated, traceable, historical, and cannot schedule unverified directions
+  ---
+  duration_ms: 65.693063
+  type: 'test'
+  ...
+# (node:22240) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: TrueForge adapter sends scoped session spec and preserves real response metrics
+ok 44 - TrueForge adapter sends scoped session spec and preserves real response metrics
+  ---
+  duration_ms: 596.408918
+  type: 'test'
+  ...
+1..44
+# tests 44
+# suites 0
+# pass 44
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2161.66438
+TAP version 13
+# (node:22394) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Care-team UI: help handoff, source review, conflicts, safe retries, rejection and stale reminders
+ok 1 - Care-team UI: help handoff, source review, conflicts, safe retries, rejection and stale reminders
+  ---
+  duration_ms: 11748.086137
+  type: 'test'
+  ...
+# (node:22395) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Patient UI: sources, completion, safe reminder retry, retrieval, care team, and import
+ok 2 - Patient UI: sources, completion, safe reminder retry, retrieval, care team, and import
+  ---
+  duration_ms: 9329.892818
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15311.045792
+
+> homeward-discharge-copilot@1.0.0 build
+> vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 1580 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.67 kB │ gzip:  0.39 kB
+dist/assets/index-B7zNXBoo.css   49.73 kB │ gzip: 10.24 kB
+dist/assets/index-DVhybMBQ.js   293.94 kB │ gzip: 89.49 kB
+✓ built in 2.22s

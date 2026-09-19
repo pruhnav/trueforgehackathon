@@ -14,7 +14,8 @@
     "eval": "node scripts/evaluate.js",
     "setup:trueforge": "node --env-file-if-exists=.env scripts/setup-trueforge.js",
     "smoke:trueforge": "node --env-file-if-exists=.env scripts/smoke-trueforge.js",
-    "check": "npm run test && npm run build"
+    "check": "npm run test && npm run build",
+    "eval:live": "node --env-file-if-exists=.env scripts/evaluate-live.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
