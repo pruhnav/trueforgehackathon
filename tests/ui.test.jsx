@@ -74,7 +74,7 @@ test('Patient UI: sources, completion, safe reminder retry, retrieval, care team
       screen.queryByRole('button', { name: 'Set reminder for Arrange your follow-up visit' }),
       null,
     );
-    await user.click(screen.getByRole('button', { name: 'Clear help request' }));
+    await user.click(screen.getByRole('button', { name: 'Withdraw help request' }));
     await waitFor(() =>
       assert.equal(
         screen.getByRole('button', { name: 'Mark complete: Arrange your follow-up visit' })
@@ -144,7 +144,7 @@ test('Patient UI: sources, completion, safe reminder retry, retrieval, care team
     await screen.findByRole('heading', { name: 'Trust is in the details.' });
     await screen.findByText('reminder.deduplicated');
     await user.click(screen.getByRole('button', { name: 'Care team', exact: true }));
-    await user.click(await screen.findByRole('button', { name: /Hui Stoltenberg/ }));
+    await user.click(await screen.findByRole('button', { name: /Hui Stoltenberg.*discharged/ }));
     await screen.findByRole('heading', { name: 'Hi Hui. What can we clear up?' });
     await user.click(screen.getByRole('button', { name: 'My documents', exact: true }));
     await user.click(await screen.findByRole('button', { name: /Synthea historical record/ }));

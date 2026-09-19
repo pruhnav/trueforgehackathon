@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { CareQueue, ReviewPanel, TaskHistory, DateEvidence } from './ReviewWorkspace.jsx';
 import {
   House,
   HeartPulse,
@@ -40,7 +41,12 @@ async function api(path, options = {}) {
     headers: { 'Content-Type': 'application/json', ...options.headers },
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Request failed.');
+  if (!response.ok) {
+    const error = new Error(data.error || 'Request failed.');
+    error.status = response.status;
+    error.code = data.code;
+    throw error;
+  }
   return data;
 }
 const post = (path, body = {}) => api(path, { method: 'POST', body: JSON.stringify(body) });
@@ -64,22 +70,34 @@ function IconButton({ label, children, ...props }) {
 function Badge({ children, tone = '' }) {
   return <span className={`badge ${tone}`}>{children}</span>;
 }
-function Modal({ title, children, onClose, wide = false }) {
+function Modal({ title, children, onClose, wide = false, dismissible = true }) {
+  const closeRef = useRef();
+  closeRef.current = () => {
+    if (dismissible) onClose();
+  };
   const ref = useRef(null);
   useEffect(() => {
     const prev = document.activeElement;
     ref.current?.focus();
     const key = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') closeRef.current();
       if (e.key === 'Tab') {
         const elements = [
           ...ref.current.querySelectorAll(
-            'button, input, textarea, select, a[href], [tabindex="0"]',
+            'button, input, textarea, select, a[href], summary, [tabindex="0"]',
           ),
-        ].filter((el) => !el.disabled);
+        ].filter(
+          (el) =>
+            !el.matches(':disabled') &&
+            !el.closest('[hidden]') &&
+            (!el.closest('details:not([open])') || el.tagName === 'SUMMARY'),
+        );
         const first = elements[0];
         const last = elements.at(-1);
-        if (e.shiftKey && document.activeElement === first) {
+        if (
+          e.shiftKey &&
+          (document.activeElement === first || document.activeElement === ref.current)
+        ) {
           e.preventDefault();
           last?.focus();
         } else if (!e.shiftKey && document.activeElement === last) {
@@ -91,11 +109,20 @@ function Modal({ title, children, onClose, wide = false }) {
     document.addEventListener('keydown', key);
     return () => {
       document.removeEventListener('keydown', key);
-      prev?.focus();
+      const replacement = [...document.querySelectorAll('[aria-label]')].find(
+        (el) => el.getAttribute('aria-label') === prev?.getAttribute('aria-label'),
+      );
+      (prev?.isConnected
+        ? prev
+        : replacement || document.querySelector('[aria-label="Care team"]')
+      )?.focus();
     };
   }, []);
   return (
-    <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div
+      className="modal-backdrop"
+      onMouseDown={(e) => e.target === e.currentTarget && closeRef.current()}
+    >
       <section
         ref={ref}
         tabIndex={-1}
@@ -106,7 +133,11 @@ function Modal({ title, children, onClose, wide = false }) {
       >
         <div className="modal-heading">
           <h2>{title}</h2>
-          <IconButton label="Close dialog" onClick={onClose}>
+          <IconButton
+            label="Close dialog"
+            onClick={() => closeRef.current()}
+            disabled={!dismissible}
+          >
             <X size={20} />
           </IconButton>
         </div>
@@ -153,10 +184,14 @@ export default function App() {
   const [action, setAction] = useState(null);
   const [busy, setBusy] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
+  const [review, setReview] = useState(null);
+  const [reviewBusy, setReviewBusy] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   async function refresh(id = patientId) {
     const [next, all] = await Promise.all([api(`/patients/${id}/plan`), api('/patients')]);
     if (activePatientId.current === id) setPlan(next);
     setPatients(all);
+    setRefreshKey((n) => n + 1);
   }
   useEffect(() => {
     setPlan(null);
@@ -204,7 +239,8 @@ export default function App() {
     setSource({ document, sectionId: task.source.sectionId });
   }
   const done = plan?.tasks.filter((t) => t.status === 'completed').length || 0;
-  const pendingApprovals = plan?.actions.filter((a) => a.status === 'proposed').length || 0;
+  const pendingApprovals =
+    plan?.actions.filter((a) => a.status === 'proposed' && !a.stale).length || 0;
   const nextTask = plan?.tasks
     .filter((task) => task.status === 'pending' && task.due && !task.helpRequestedAt)
     .sort((a, b) => a.due.localeCompare(b.due))[0];
@@ -451,6 +487,7 @@ export default function App() {
                             const Icon = categoryIcons[task.category];
                             const completed = task.status === 'completed';
                             const needsReview = task.status === 'needs_clarification';
+                            const rejected = task.status === 'rejected';
                             const saved = plan.actions.find(
                               (a) => a.taskId === task.id && a.status === 'executed',
                             );
@@ -462,7 +499,9 @@ export default function App() {
                               >
                                 <button
                                   className={`task-check ${completed ? 'checked' : ''}`}
-                                  disabled={busy || needsReview || !!task.helpRequestedAt}
+                                  disabled={
+                                    busy || needsReview || rejected || !!task.helpRequestedAt
+                                  }
                                   aria-label={`${completed ? 'Reopen' : 'Mark complete'}: ${task.title}`}
                                   onClick={() =>
                                     perform(
@@ -490,8 +529,10 @@ export default function App() {
                                     )}
                                     {needsReview && <Badge tone="amber">Needs clarification</Badge>}
                                     {completed && <Badge tone="green">Complete</Badge>}
+                                    {rejected && <Badge>Rejected · retained in history</Badge>}
                                   </div>
-                                  <p>{task.detail}</p>
+                                  <p>{task.instruction?.quote ?? task.detail}</p>
+                                  <DateEvidence task={task} />
                                   <div className="task-meta">
                                     <span className={overdue ? 'overdue' : ''}>
                                       <Clock3 size={12} />
@@ -499,7 +540,7 @@ export default function App() {
                                         ? `${overdue ? 'Overdue · ' : 'By '}${prettyDate(task.due)}`
                                         : needsReview
                                           ? 'No date specified'
-                                          : 'Before your visit'}
+                                          : 'No deadline established'}
                                     </span>
                                     <span className="meta-dot">·</span>
                                     <button
@@ -508,8 +549,16 @@ export default function App() {
                                     >
                                       <Link2 size={12} /> View source
                                     </button>
+                                    {task.instruction && (
+                                      <button
+                                        className="source-link"
+                                        onClick={() => showSource({ source: task.instruction })}
+                                      >
+                                        <Link2 size={12} /> View reviewed source
+                                      </button>
+                                    )}
                                   </div>
-                                  {!completed && (
+                                  {((!completed && !rejected) || !!task.helpRequestedAt) && (
                                     <button
                                       className="text-button"
                                       disabled={busy}
@@ -520,14 +569,17 @@ export default function App() {
                                               requested: !task.helpRequestedAt,
                                             }),
                                           task.helpRequestedAt
-                                            ? 'Help request cleared.'
+                                            ? 'Help request withdrawn by you. No care-team resolution was recorded.'
                                             : 'Flagged in the local care-team view. No message was sent.',
                                         )
                                       }
                                     >
                                       <CircleHelp size={14} />{' '}
-                                      {task.helpRequestedAt ? 'Clear help request' : 'Need help'}
+                                      {task.helpRequestedAt ? 'Withdraw help request' : 'Need help'}
                                     </button>
+                                  )}
+                                  {(task.lastHelpAuditId || task.lastReviewId) && (
+                                    <TaskHistory task={task} api={api} />
                                   )}
                                   {saved && (
                                     <a
@@ -540,8 +592,7 @@ export default function App() {
                                   )}
                                 </div>
                                 {!task.helpRequestedAt &&
-                                  !needsReview &&
-                                  !completed &&
+                                  task.status === 'pending' &&
                                   task.due &&
                                   !saved && (
                                     <IconButton
@@ -626,6 +677,7 @@ export default function App() {
                         detail="As of the demo date: September 19"
                       />
                     </div>
+                    <CareQueue api={api} refreshKey={refreshKey} onOpen={setReview} />
                     <section className="card">
                       <div className="section-heading">
                         <h2>Patient follow-through</h2>
@@ -800,6 +852,23 @@ export default function App() {
           {toast}
         </div>
       )}
+      {review && (
+        <Modal
+          title="Review & respond"
+          wide
+          dismissible={!reviewBusy}
+          onClose={() => setReview(null)}
+        >
+          <ReviewPanel
+            key={review.task.id}
+            selection={review}
+            api={api}
+            post={post}
+            onBusy={setReviewBusy}
+            onSaved={refresh}
+          />
+        </Modal>
+      )}
       {source && (
         <Modal title={source.document.title} onClose={() => setSource(null)} wide>
           <div className="source-intro">
@@ -887,9 +956,10 @@ export default function App() {
       )}
       {action && (
         <ActionModal
-          action={action}
+          action={plan.actions.find((a) => a.id === action.id) || action}
           patientId={patientId}
           onClose={() => setAction(null)}
+          onRepropose={() => remind(plan.tasks.find((t) => t.id === action.taskId))}
           onChange={refresh}
         />
       )}
@@ -1047,8 +1117,15 @@ function ImportModal({ patientId, onClose, onImported }) {
   );
 }
 
-function ActionModal({ action: initial, patientId, onClose, onChange }) {
+function ActionModal({ action: initial, patientId, onClose, onChange, onRepropose }) {
   const [action, setAction] = useState(initial);
+  useEffect(
+    () =>
+      setAction((current) =>
+        current.id !== initial.id ? initial : { ...current, stale: initial.stale },
+      ),
+    [initial.id, initial.stale],
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [simulate, setSimulate] = useState(false);
@@ -1088,7 +1165,7 @@ function ActionModal({ action: initial, patientId, onClose, onChange }) {
           {action.status === 'proposed' ? 'Waiting for your approval' : action.status}
         </Badge>
       </div>
-      {action.status === 'approved' && (
+      {!action.stale && action.status === 'approved' && (
         <label className="checkbox-label">
           <input
             type="checkbox"
@@ -1104,8 +1181,19 @@ function ActionModal({ action: initial, patientId, onClose, onChange }) {
         </p>
       )}
       {action.receipt && <p className="receipt">Receipt: {action.receipt}</p>}
+      {action.stale && (
+        <p role="status" className="inline-error">
+          This reminder no longer matches the current task. Propose a new reminder and review it
+          again.
+        </p>
+      )}
       <div className="modal-actions">
-        {action.status === 'proposed' && (
+        {action.stale && (
+          <button className="button primary" disabled={busy} onClick={onRepropose}>
+            Propose a new reminder
+          </button>
+        )}
+        {!action.stale && action.status === 'proposed' && (
           <>
             <button
               className="button secondary"
@@ -1124,7 +1212,7 @@ function ActionModal({ action: initial, patientId, onClose, onChange }) {
             </button>
           </>
         )}
-        {action.status === 'approved' && (
+        {!action.stale && action.status === 'approved' && (
           <button
             className="button primary"
             disabled={busy}
@@ -1176,7 +1264,10 @@ function Assistant({
     } catch {}
     try {
       const params = new URLSearchParams(window.location.search);
-      if ((params.get('history') === '1' || params.get('history') === 'true') && patientId === 'demo-001') {
+      if (
+        (params.get('history') === '1' || params.get('history') === 'true') &&
+        patientId === 'demo-001'
+      ) {
         return [
           {
             role: 'user',
@@ -1193,7 +1284,7 @@ function Assistant({
               total_tokens: 3684,
             },
             citations: [],
-            text: "I can’t tell from your discharge documents whether the follow-up should be in person or by video. The record says the follow-up note “does not specify whether the visit should be in person or by video” and advises you to “contact the clinic to clarify the visit format.” Source: **Fictional Discharge Addendum**, section **Imported passage 3**.\n\nFor preparation, your documents say to:\n- “Bring your discharge summary and current medication list to the follow-up visit.” Source: **Discharge summary**, section **Paperwork**\n- “Write down the questions you would like to discuss with your care team before your next visit.” Source: **Fictional Discharge Addendum**, section **Imported passage 2**\n\nIf you want, I can also help you summarize the questions to bring to the clinic.",
+            text: 'I can’t tell from your discharge documents whether the follow-up should be in person or by video. The record says the follow-up note “does not specify whether the visit should be in person or by video” and advises you to “contact the clinic to clarify the visit format.” Source: **Fictional Discharge Addendum**, section **Imported passage 3**.\n\nFor preparation, your documents say to:\n- “Bring your discharge summary and current medication list to the follow-up visit.” Source: **Discharge summary**, section **Paperwork**\n- “Write down the questions you would like to discuss with your care team before your next visit.” Source: **Fictional Discharge Addendum**, section **Imported passage 2**\n\nIf you want, I can also help you summarize the questions to bring to the clinic.',
           },
         ];
       }
@@ -1370,9 +1461,11 @@ function Assistant({
             <ShieldCheck size={18} />
             <div>
               <strong>
-                {a.status === 'proposed'
-                  ? 'A reminder is ready for your review'
-                  : 'Your approved reminder is ready to create'}
+                {a.stale
+                  ? 'This reminder needs a new proposal'
+                  : a.status === 'proposed'
+                    ? 'A reminder is ready for your review'
+                    : 'Your approved reminder is ready to create'}
               </strong>
               <span>{a.title}</span>
             </div>
