@@ -1,0 +1,39 @@
+{
+  "name": "homeward-discharge-copilot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.14"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c cyan,green \"node --watch --env-file-if-exists=.env server/index.js\" \"vite --host 127.0.0.1\"",
+    "build": "vite build",
+    "start": "node --env-file-if-exists=.env server/index.js",
+    "test": "node --test tests/*.test.js && node --import tsx --test tests/*.test.jsx",
+    "eval": "node scripts/evaluate.js",
+    "setup:trueforge": "node --env-file-if-exists=.env scripts/setup-trueforge.js",
+    "smoke:trueforge": "node --env-file-if-exists=.env scripts/smoke-trueforge.js",
+    "check": "npm run test && npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "express": "^5.1.0",
+    "fast-xml-parser": "^5.11.1",
+    "lucide-react": "^0.468.0",
+    "pdf-parse": "^2.4.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.2.0",
+    "jsdom": "^30.1.0",
+    "prettier": "^3.9.8",
+    "tsx": "^4.23.13",
+    "vite": "^6.4.1"
+  }
+}
