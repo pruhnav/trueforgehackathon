@@ -1169,7 +1169,42 @@ function Assistant({
 }) {
   const [mode, setMode] = useState(status?.ready ? 'live' : 'source-search');
   const [modeChosen, setModeChosen] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`homeward_chat_${patientId}`);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if ((params.get('history') === '1' || params.get('history') === 'true') && patientId === 'demo-001') {
+        return [
+          {
+            role: 'user',
+            text: 'Is my follow-up appointment supposed to be in person or via video call, and how should I prepare for it? Please cite your sources from my discharge documents.',
+          },
+          {
+            role: 'assistant',
+            mode: 'live',
+            sessionId: '01m2xqts453ea0pwtry2aken37',
+            latencyMs: 3121,
+            metrics: {
+              total_input_tokens: 3497,
+              total_output_tokens: 187,
+              total_tokens: 3684,
+            },
+            citations: [],
+            text: "I can’t tell from your discharge documents whether the follow-up should be in person or by video. The record says the follow-up note “does not specify whether the visit should be in person or by video” and advises you to “contact the clinic to clarify the visit format.” Source: **Fictional Discharge Addendum**, section **Imported passage 3**.\n\nFor preparation, your documents say to:\n- “Bring your discharge summary and current medication list to the follow-up visit.” Source: **Discharge summary**, section **Paperwork**\n- “Write down the questions you would like to discuss with your care team before your next visit.” Source: **Fictional Discharge Addendum**, section **Imported passage 2**\n\nIf you want, I can also help you summarize the questions to bring to the clinic.",
+          },
+        ];
+      }
+    } catch {}
+    return [];
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(`homeward_chat_${patientId}`, JSON.stringify(messages));
+    } catch {}
+  }, [messages, patientId]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
