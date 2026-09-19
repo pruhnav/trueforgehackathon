@@ -1,0 +1,13 @@
+flowchart LR
+  Fixture[Authored fixture] --> Doc[Patient document and passages]
+  Upload[Text or PDF import] --> Doc
+  Synthea[Official Synthea archive] --> History[Historical document with provenance]
+  History --> Search[Searchable patient context]
+  Doc --> Search
+  Doc --> Task[Exact cited task]
+  Task --> Review[Human instruction review]
+  Review --> Eligible[Pending task with supported date if known]
+  Eligible --> Proposal[Reminder proposal bound to task revision]
+  Proposal --> Approval[Separate human approval]
+  Approval --> Receipt[Local receipt and ICS]
+  History -. separate discharge evidence required .-> Review

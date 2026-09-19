@@ -1,0 +1,100 @@
+{
+  "sourceReport": "docs/evidence/integrated-main/browser.json",
+  "applicationCommit": "0ce9dad2a4a9dfd4815cad0a742fb46baa29bad5",
+  "startedAt": "2026-09-19T22:34:06.854Z",
+  "finishedAt": "2026-09-19T22:34:26.357Z",
+  "mode": "real-browser-source-search",
+  "desktopViewport": {
+    "width": 1600,
+    "height": 1000
+  },
+  "mobileViewport": {
+    "width": 390,
+    "height": 844
+  },
+  "paidModelRequests": 0,
+  "note": "Existing historical captures, not recaptured during the README audit. Run interval is reported; per-image timestamps were not recorded. See PATIENT_JOURNEY.md for presentation captions and limits.",
+  "captures": [
+    {
+      "file": "docs/assets/journey/01-recovery.png",
+      "caption": "Alex sees the next task, deadlines, and unresolved laboratory question.",
+      "sha256": "e33b3e24e2e4fc3dd097446003899e8170f4d37b81215d1a49864fd4b65cfce0",
+      "width": 1600,
+      "height": 1000,
+      "hashVerified": true
+    },
+    {
+      "file": "docs/assets/journey/02-source.png",
+      "caption": "The follow-up task links to its original discharge passage.",
+      "sha256": "ba65e55f8874c1418ebc2630e818977832203a4c33149eff0649c225a75676d2",
+      "width": 1600,
+      "height": 1000,
+      "hashVerified": true
+    },
+    {
+      "file": "docs/assets/journey/03-source-search.png",
+      "caption": "Paperwork guidance is retrieved as exact excerpts; no live model is involved.",
+      "sha256": "b80bc2213a76598b65714e0a14efc40e81a603fcfaf2dc381254ae476ac9ae7a",
+      "width": 1600,
+      "height": 1000,
+      "hashVerified": true
+    },
+    {
+      "file": "docs/assets/journey/04-help-review.png",
+      "caption": "Resolving the help conversation preserves the instruction review gate and unknown date.",
+      "sha256": "d297d96136bd6bb54087c437f293f0b55b2a71faea21de5896191d787f1cf41f",
+      "width": 1600,
+      "height": 1000,
+      "hashVerified": true
+    },
+    {
+      "file": "docs/assets/journey/05-approval.png",
+      "caption": "The patient explicitly approves a local reminder, separate from instruction review.",
+      "sha256": "aa4ebff67d37cd92b576354b9c1ef2645c6f3b641e3d5610c96151787e46596a",
+      "width": 1600,
+      "height": 1000,
+      "hashVerified": true
+    },
+    {
+      "file": "docs/assets/journey/06-safe-retry.png",
+      "caption": "A retry returns one saved reminder and a real downloadable calendar file.",
+      "sha256": "6f9dd3773cc033bfd7f2601589e4d7acd522aa4f6962cb8ccd10882b4709f547",
+      "width": 1600,
+      "height": 1000,
+      "hashVerified": true
+    },
+    {
+      "file": "docs/assets/journey/07-import-review.png",
+      "caption": "An imported passage becomes actionable only after explicit review with date evidence.",
+      "sha256": "c429d9314b93256f804af96278b1e4942456efb084a07e4eb79042e99f1b4408",
+      "width": 1600,
+      "height": 1000,
+      "hashVerified": true
+    },
+    {
+      "file": "docs/assets/journey/08-activity.png",
+      "caption": "Actual local traces expose review, approval, reminder creation, and deduplication.",
+      "sha256": "15289d7ea0dbb92a97dc80a1d8d4e99162ec096c1cd395fe3626ffb2737399d3",
+      "width": 1600,
+      "height": 1000,
+      "hashVerified": true
+    },
+    {
+      "file": "docs/assets/journey/09-provenance.png",
+      "caption": "Synthea history displays source provenance and stays distinct from discharge instructions.",
+      "sha256": "b104ab96dffb31b400a7b7e8087fac13fe0f3ef2e0487a6971b0c1062d8520a7",
+      "width": 1600,
+      "height": 1000,
+      "hashVerified": true
+    },
+    {
+      "file": "docs/assets/journey/10-mobile.png",
+      "caption": "Mobile-width document workspace: a responsive-layout capture, not an accessibility certification.",
+      "sha256": "9af95776d188bf5828ce20e2431baa7220b1b12fee2d446c10f91a9fac1ce081",
+      "width": 390,
+      "height": 844,
+      "hashVerified": true
+    }
+  ],
+  "browser": "150.0.7871.125"
+}

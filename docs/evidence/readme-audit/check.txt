@@ -1,0 +1,100 @@
+
+> homeward-discharge-copilot@1.0.0 check
+> npm run test && npm run build
+
+
+> homeward-discharge-copilot@1.0.0 test
+> node --test tests/*.test.js && node --import tsx --test tests/*.test.jsx
+
+✔ four specialist roles have bounded native specs and server-enforced MCP permissions (185.9942ms)
+✔ provider-independent model selection, registration, and native summarizer response (40.2042ms)
+✔ summary remains available without a model and after a provider failure (12.7355ms)
+✔ unverifiable model output and changed clinical snapshots use fresh safe fallbacks (23.5288ms)
+✔ Discharge summaries are source-linked, patient-scoped reads with explicit missing dates (33.3487ms)
+✔ Summaries keep unreviewed and Synthea passages separate from actionable instructions (4.9442ms)
+✔ Summary snapshots follow review/help changes without rewriting original instructions (11.9427ms)
+✔ Agent references cannot inject clinical prose, cross patients, or invent action receipts (14.1871ms)
+✔ Next-step chat and plan agree for every seeded patient without clinical mutations (6.4784ms)
+✔ Guidance distinguishes undated, paused, clarification, completed, and rejected tasks (9.0748ms)
+✔ Guidance uses reviewed instructions and labels human dates without rewriting exact quotes (8.8045ms)
+✔ Guidance fails closed on invalid citations, historical instructions, and invalid dates (13.0282ms)
+✔ Next-step recognition is bounded and specific source search preserves punctuation (8.8519ms)
+✔ Guidance has stable date ordering and does not bypass reminder approval or help gates (8.5862ms)
+✔ Review activates an exact instruction with an evidenced date and separate reminder approval (3.2477ms)
+✔ Review with no deadline leaves due null and prevents reminders (2.1726ms)
+✔ Clarify and reject preserve sources and cannot be bypassed by completion or a duplicate proposal (2.9785ms)
+✔ Synthea history requires a separate exact instruction; a review note cannot authorize it (2.964ms)
+✔ Invalid calendar dates and unsupported date evidence never mutate the task (5.4794ms)
+✔ Review commands reject foreign tasks, foreign evidence, fabricated quotes, and reviewer impersonation (2.856ms)
+✔ Review retries replay one receipt; stale revisions and reused keys cannot overwrite newer decisions (3.3915ms)
+✔ A new reviewed instruction invalidates old reminders even when status and date are unchanged (6.1661ms)
+✔ Responding to and resolving help never approves an unverified task (3.8415ms)
+✔ Help persists after reopening SQLite and remains patient scoped (58.5884ms)
+✔ Every fixture task has an exact source (3.8098ms)
+✔ Unknown deadlines stay unknown (1.5037ms)
+✔ Execution without approval is blocked (2.781ms)
+✔ Patient boundaries reject foreign records (1.9259ms)
+✔ Retry after response loss creates no duplicate (2.44ms)
+✔ Declined actions cannot execute (1.8873ms)
+✔ Fabricated citations are rejected (1.4881ms)
+✔ Imported instructions require human review (1.5562ms)
+✔ Missing answers are not invented (1.8694ms)
+✔ Changed tasks invalidate pending execution (2.3561ms)
+✔ Repeated proposals reuse the existing action (1.5547ms)
+✔ Agent runs have bounded tool access and iterations (1.246ms)
+✔ State survives reopening the database (38.0085ms)
+✔ Education lookup filters URLs, caches results, and uses no patient data (80.7179ms)
+✔ Education failure falls back without changing the care plan (2.7161ms)
+✔ evaluation requires a bounded authorization and rejects unknown scenarios (1.1812ms)
+✔ assessor does not pass answer quality, catches tool attempts and unauthorized writes (0.684ms)
+✔ isolated harness records a real MCP exchange with a simulated runtime; never a live-model claim (394.6274ms)
+✔ HTTP and existing patient-bound MCP plan share fresh guidance without model calls (179.8564ms)
+✔ HTTP API and real MCP client exercise the approval boundary (321.4355ms)
+✔ HTTP import -> proposal -> evidenced review -> separately approved date-only calendar (126.7629ms)
+✔ HTTP review validation provides explicit errors without changing task state (49.5268ms)
+✔ concurrent HTTP decisions require reload and changed instructions require new reminder approval (28.6027ms)
+✔ HTTP help response/resolution retain history and review gates; MCP exposes neither operation (49.7481ms)
+✔ review/help audit, retry receipts, and revisions survive reopening SQLite (61.1943ms)
+✔ legacy upgrade preserves local records and receipts but requires reapproval for unbound actions (88.3473ms)
+✔ task mutation, audit, trace, and command receipt roll back together on storage failure (5.003ms)
+✔ separate SQLite connections cannot commit reviews from the same displayed revision (53.88ms)
+✔ reminder fingerprints catch instruction/source/date changes and completion round trips (5.8684ms)
+✔ unsupported document trust and mutated source passages fail closed (6.0866ms)
+✔ help resolution resumes only an unchanged approved reminder and logs no response text (3.8968ms)
+✔ source date formats are explicit and relative dates require human clarification (4.483ms)
+✔ help requests preserve review gates and block stale reminder execution (14.7597ms)
+✔ Synthea snapshot is isolated, traceable, historical, and cannot schedule unverified directions (9.7251ms)
+✔ TrueForge adapter sends scoped session spec and preserves real response metrics (91.0219ms)
+ℹ tests 59
+ℹ suites 0
+ℹ pass 59
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 922.2951
+✔ next-step UI agrees with chat, refreshes after changes, and preserves literal reviewed sources (4022.5499ms)
+✔ Care-team UI: help handoff, source review, conflicts, safe retries, rejection and stale reminders (12046.3871ms)
+✔ patient summary and specialist controls are accessible without a model; emergency calling survives API failure (2184.0654ms)
+✔ Patient UI: sources, completion, safe reminder retry, retrieval, care team, and import (5398.0169ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13373.7825
+
+> homeward-discharge-copilot@1.0.0 build
+> vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 1581 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.67 kB │ gzip:  0.39 kB
+dist/assets/index-CqMw--Dn.css   50.80 kB │ gzip: 10.48 kB
+dist/assets/index-octm9nx9.js   300.71 kB │ gzip: 91.35 kB
+✓ built in 1.65s

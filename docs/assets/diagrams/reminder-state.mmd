@@ -1,0 +1,14 @@
+stateDiagram-v2
+  [*] --> Proposed: Eligible dated task
+  Proposed --> Approved: Human approval
+  Proposed --> Rejected: Human decline
+  Approved --> Executed: Binding valid and no open help
+  Executed --> Executed: Retry returns existing receipt
+  Executed --> Calendar: Download ICS
+  Proposed --> Stale: Task instruction changes
+  Approved --> Stale: Task instruction changes
+  Stale --> Proposed: New proposal and new approval required
+  note right of Stale
+    Stale is a derived flag, not a persisted status.
+    The old proposal remains in history.
+  end note
