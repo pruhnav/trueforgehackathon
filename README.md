@@ -97,7 +97,7 @@ npm run build
 
 Once a model is connected and the app is running, **`npm run smoke:trueforge`** performs a real model/tool run. This uses your configured model and may consume event credits. Review the response and trace; automated runtime checks are not a substitute for clinical evaluation.
 
-GitHub Actions runs the tests, evaluation, and production build on pushes and pull requests. See [the demo script](docs/DEMO.md), [team ownership](docs/TEAM.md), and [validation notes](docs/VALIDATION.md).
+GitHub Actions runs the tests, evaluation, and production build on pushes and pull requests. See [the demo script](docs/DEMO.md), [team ownership](docs/TEAM.md), [validation notes](docs/VALIDATION.md), and the [dataset and agent integration guide](docs/DATASET-AND-AGENT-INTEGRATION-GUIDE.md).
 
 ## Scope and demo data
 
