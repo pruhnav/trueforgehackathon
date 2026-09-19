@@ -53,12 +53,6 @@ const categoryIcons = {
   'check-in': HeartPulse,
   clarification: CircleHelp,
 };
-const labels = {
-  appointment: 'Follow-up',
-  preparation: 'Preparation',
-  'check-in': 'Check-in',
-  clarification: 'Care-team review',
-};
 function IconButton({ label, children, ...props }) {
   return (
     <button className="icon-button" aria-label={label} title={label} {...props}>
@@ -189,6 +183,9 @@ export default function App() {
   }
   const done = plan?.tasks.filter((t) => t.status === 'completed').length || 0;
   const pendingApprovals = plan?.actions.filter((a) => a.status === 'proposed').length || 0;
+  const nextTask = plan?.tasks
+    .filter((task) => task.status === 'pending' && task.due)
+    .sort((a, b) => a.due.localeCompare(b.due))[0];
   const titles = {
     plan: 'My recovery',
     team: 'Care team',
@@ -209,13 +206,13 @@ export default function App() {
           }}
         >
           <span className="brand-mark">
-            <House size={23} strokeWidth={1.8} />
+            <HeartPulse size={23} strokeWidth={2} />
           </span>
           <span>
             homeward<span className="brand-dot">.</span>
           </span>
         </a>
-        <div className="workspace-label">YOUR PATH HOME</div>
+        <div className="workspace-label">CARE WORKSPACE</div>
         <nav aria-label="Main navigation">
           {[
             ['plan', LayoutDashboard, 'My recovery'],
@@ -249,8 +246,8 @@ export default function App() {
             <span className="support-icon">
               <ShieldCheck size={21} />
             </span>
-            <h3>Your care. Your say.</h3>
-            <p>Every action stays in your control. We’ll ask before taking the next step.</p>
+            <h3>Built around your approval</h3>
+            <p>Review proposed actions and see exactly what happened.</p>
             <button onClick={() => setView('harness')}>
               How it works <ArrowUpRight size={14} />
             </button>
@@ -312,11 +309,11 @@ export default function App() {
                 <>
                   <div className="page-heading">
                     <div>
-                      <div className="eyebrow">ONE STEP AT A TIME</div>
-                      <h1>A little clarity. A better recovery.</h1>
+                      <div className="eyebrow">RECOVERY OVERVIEW</div>
+                      <h1>Your recovery, organized.</h1>
                       <p>
-                        Welcome home, {plan.patient.name.split(' ')[0]}. Let’s make your next steps
-                        feel simpler.
+                        {plan.patient.name.split(' ')[0]}, here’s your plan. Track next steps and
+                        keep your care team in the loop.
                       </p>
                     </div>
                     <button className="button secondary" onClick={() => setImportOpen(true)}>
@@ -326,53 +323,34 @@ export default function App() {
                   <section className="recovery-hero">
                     <div className="hero-copy">
                       <div className="hero-pill">
-                        <span /> YOUR RECOVERY COMPANION
+                        <span /> {nextTask ? 'NEXT ON YOUR PLAN' : 'YOUR RECOVERY CHECKLIST'}
                       </div>
-                      <h2>
-                        Home is the next chapter.
-                        <br />
-                        We’re here for the next steps.
-                      </h2>
+                      <h2>{nextTask ? nextTask.title : 'No dated tasks left to complete.'}</h2>
                       <p>
-                        Your instructions, appointments, and questions.
-                        <br className="desktop-break" /> Together in one clear plan, with you in
-                        control.
+                        {nextTask
+                          ? 'One clear next step, backed by your discharge instructions.'
+                          : 'Review your checklist below for preparation and clarification items.'}
                       </p>
-                      <button className="button cream" onClick={() => setAssistantOpen(true)}>
-                        Ask about my discharge <ArrowUpRight size={17} />
+                      <button
+                        className="button hero-action"
+                        onClick={() => (nextTask ? showSource(nextTask) : setAssistantOpen(true))}
+                      >
+                        {nextTask ? 'Review instruction' : 'Ask Homeward'}{' '}
+                        <ArrowUpRight size={17} />
                       </button>
                     </div>
-                    <div className="hero-art" aria-hidden="true">
-                      <div className="art-orbit orbit-one" />
-                      <div className="art-orbit orbit-two" />
-                      <div className="art-sun" />
-                      <svg className="house-art" viewBox="0 0 260 230">
-                        <path
-                          d="M37 114 128 40l93 74"
-                          stroke="#d7e9c8"
-                          strokeWidth="12"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path d="M59 109v99h140v-99" fill="#bdd4ac" />
-                        <path d="M109 207v-61a19 19 0 0 1 38 0v61" fill="#244c40" />
-                        <rect x="75" y="131" width="21" height="27" rx="4" fill="#ecedd0" />
-                        <rect x="160" y="131" width="21" height="27" rx="4" fill="#ecedd0" />
-                        <path d="M202 205c-21-43-10-65 5-82 27 30 32 53-5 82" fill="#83a67d" />
-                        <path d="M210 207c3-36 16-46 35-47-1 24-8 39-35 47" fill="#d9e7ba" />
-                        <path d="M37 206c-28-33-22-52-10-64 22 12 27 32 10 64" fill="#d9e7ba" />
-                        <path d="M36 207c9-28 24-32 39-29-7 22-18 31-39 29" fill="#83a67d" />
-                        <path
-                          d="M19 209h228"
-                          stroke="#d7e9c8"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      <div className="floating-check">
-                        <Check size={16} />
-                        <span>A plan you can follow</span>
+                    <div className="focus-summary">
+                      <div className="focus-summary-label">
+                        <CalendarDays size={16} /> {nextTask ? 'DUE DATE' : 'PLAN PROGRESS'}
+                      </div>
+                      <strong>
+                        {nextTask ? prettyDate(nextTask.due) : `${done} / ${plan.tasks.length}`}
+                      </strong>
+                      <span>
+                        {nextTask ? 'From your discharge record' : 'Tasks reported complete'}
+                      </span>
+                      <div className="focus-summary-footer">
+                        <Link2 size={13} /> Source-linked care plan
                       </div>
                     </div>
                   </section>
@@ -501,8 +479,8 @@ export default function App() {
                         <div className="companion-icon">
                           <Sparkles size={23} />
                         </div>
-                        <Badge tone="green">YOUR DISCHARGE GUIDE</Badge>
-                        <h2>A question on your mind?</h2>
+                        <Badge>DISCHARGE ASSISTANT</Badge>
+                        <h2>Get clarity on your plan.</h2>
                         <p>
                           Find the answer in your discharge instructions, with the source right
                           there.

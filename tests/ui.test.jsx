@@ -46,7 +46,7 @@ test('Patient UI: sources, completion, safe reminder retry, retrieval, care team
   const user = userEvent.setup({ document: dom.window.document });
   try {
     render(<App />);
-    await screen.findByRole('heading', { name: 'A little clarity. A better recovery.' });
+    await screen.findByRole('heading', { name: 'Your recovery, organized.' });
     await user.click(screen.getAllByRole('button', { name: 'View source' })[0]);
     assert.ok(screen.getByRole('dialog', { name: 'Discharge summary' }));
     assert.match(screen.getByRole('dialog').textContent, /within seven days/);
@@ -76,7 +76,7 @@ test('Patient UI: sources, completion, safe reminder retry, retrieval, care team
     await user.click(screen.getByRole('button', { name: 'Care team', exact: true }));
     await screen.findByText('Overdue follow-up');
     await user.click(screen.getByRole('button', { name: /Jordan Rivera/ }));
-    await screen.findByText(/Welcome home, Jordan/);
+    await screen.findByText(/Jordan, here’s your plan/);
     await user.click(screen.getByRole('button', { name: 'Add discharge record' }));
     await user.type(
       screen.getByLabelText('Discharge instructions'),
